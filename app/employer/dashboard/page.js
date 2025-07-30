@@ -369,7 +369,7 @@ function EmployerDashboard() {
               <motion.div variants={itemVariants}>
                 <Card className="p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Request Employee Verification</h2>
-                  <p className="text-gray-600 mb-6">Send a verification request to an employee if you don't have their access code.</p>
+                  <p className="text-gray-600 mb-6">Send a verification request to an employee if you don&apos;t have their access code.</p>
                   
                   <div className="space-y-4">
                     <Input

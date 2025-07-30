@@ -75,7 +75,7 @@ function PricingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           >
-            We're working on a pricing model that's fair to remote teams and freelancers alike. 
+            We&apos;re working on a pricing model that&apos;s fair to remote teams and freelancers alike. 
             SunLighter is currently <span className="font-semibold text-emerald-600">free</span> while 
             we build in public and gather feedback.
           </motion.p>
@@ -166,7 +166,7 @@ function PricingPage() {
                 <div className="text-4xl mb-4">🚧</div>
                 <h2 className="text-3xl font-bold mb-4">Future Pricing Plans</h2>
                 <p className="text-xl opacity-90 mb-6">
-                  We're crafting flexible plans for individuals, teams, and enterprises. 
+                  We&apos;re crafting flexible plans for individuals, teams, and enterprises. 
                   Stay tuned for announcements!
                 </p>
                 

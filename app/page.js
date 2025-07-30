@@ -344,7 +344,7 @@ function HomePage() {
               <Card className="p-8 text-center">
                 <div className="text-6xl mb-4">{testimonials[currentTestimonial].avatar}</div>
                 <blockquote className="text-xl text-gray-700 mb-6 italic">
-                  "{testimonials[currentTestimonial].content}"
+                  &quot;{testimonials[currentTestimonial].content}&quot;
                 </blockquote>
                 <div>
                   <div className="font-semibold text-gray-900">{testimonials[currentTestimonial].name}</div>

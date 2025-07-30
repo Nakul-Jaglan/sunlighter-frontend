@@ -47,7 +47,7 @@ export default function AddEmployment() {
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Verification Requested!</h2>
               <p className="text-gray-600 mb-4">
-                We've sent a verification request to <strong>{formData.companyName}</strong> for your role as{" "}
+                We&apos;ve sent a verification request to <strong>{formData.companyName}</strong> for your role as{" "}
                 <strong>{formData.role}</strong>.
               </p>
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-left">
@@ -55,7 +55,7 @@ export default function AddEmployment() {
                 <ul className="text-sm text-yellow-700 space-y-1">
                   <li>• The company will receive a verification request</li>
                   <li>• They can verify your employment details</li>
-                  <li>• You'll be notified once verification is complete</li>
+                  <li>• You&apos;ll be notified once verification is complete</li>
                   <li>• This typically takes 1-3 business days</li>
                 </ul>
               </div>

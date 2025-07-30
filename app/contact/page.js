@@ -147,7 +147,7 @@ function ContactPage() {
         <motion.div className="text-center mb-12" variants={itemVariants}>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Get in Touch</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Have questions about SunLighter? We're here to help you streamline your employment verification process.
+            Have questions about SunLighter? We&apos;re here to help you streamline your employment verification process.
           </p>
         </motion.div>
 
