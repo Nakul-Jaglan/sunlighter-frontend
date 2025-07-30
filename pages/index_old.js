@@ -1,6 +1,6 @@
 "use client"
 
-import Layout from "../components/layout/Layout"
+import Layout from "../components/Layout"
 import Card from "../components/Card"
 import Button from "../components/Button"
 
@@ -69,11 +69,11 @@ export default function Home() {
   ]
 
   const handleGetStarted = () => {
-    window.location.href = "/signup"
+    window.location.href = "/register"
   }
 
   const handleCompanyRegister = () => {
-    window.location.href = "/signup"
+    window.location.href = "/company/register"
   }
 
   const handleVerifyEmployee = () => {
@@ -172,10 +172,10 @@ export default function Home() {
               </div>
             </div>
             <div className="mt-8">
-              <Button onClick={handleVerifyEmployee} className="mr-4 py-2">
+              <Button onClick={handleVerifyEmployee} className="mr-4">
                 Verify Employee Now
               </Button>
-              <Button variant="outline" onClick={handleCompanyRegister} className="py-2">
+              <Button variant="outline" onClick={handleCompanyRegister}>
                 Register Your Company
               </Button>
             </div>
