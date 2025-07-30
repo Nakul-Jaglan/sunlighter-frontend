@@ -285,7 +285,7 @@ function LoginPage() {
                     />
                   </motion.div>
 
-                  <motion.div className="flex items-center justify-between" variants={itemVariants}>
+                  {/* <motion.div className="flex items-center justify-between" variants={itemVariants}>
                     <label className="flex items-center">
                       <motion.input
                         type="checkbox"
@@ -300,7 +300,7 @@ function LoginPage() {
                     <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 transition-colors duration-200">
                       Forgot password?
                     </a>
-                  </motion.div>
+                  </motion.div> */}
 
                   <motion.div variants={itemVariants}>
                     <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">

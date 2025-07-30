@@ -156,7 +156,7 @@ const Header = () => {
             className="flex items-center"
           >
             <Link href="/" className="flex items-center space-x-3" aria-label="Home">
-              <div className="relative w-8 h-8 sm:w-30 sm:h-30 md:w-50 md:h-50">
+              <div className="relative w-50 h-50">
                 <Image
                   src="/letter.png"
                   alt="Company Logo"
@@ -172,7 +172,7 @@ const Header = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8" role="menubar">
+          <div className="hidden lg:flex items-center space-x-8" role="menubar">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.name}
@@ -202,7 +202,7 @@ const Header = () => {
 
           {/* Desktop Auth Buttons */}
           <motion.div 
-            className="hidden md:flex items-center space-x-4"
+            className="hidden lg:flex items-center space-x-4"
             variants={authButtonVariants}
             initial="initial"
             animate="visible"
@@ -238,7 +238,7 @@ const Header = () => {
             initial="initial"
             animate={isMobileMenuOpen ? "open" : "visible"}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+            className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
             aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
@@ -265,7 +265,7 @@ const Header = () => {
           id="mobile-menu"
           variants={mobileMenuVariants}
           animate={isMobileMenuOpen ? "open" : "closed"}
-          className="md:hidden overflow-hidden bg-white border-t border-gray-200"
+          className="lg:hidden overflow-hidden bg-white border-t border-gray-200"
           role="menu"
           aria-orientation="vertical"
         >

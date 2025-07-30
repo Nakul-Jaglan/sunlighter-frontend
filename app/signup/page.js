@@ -17,7 +17,7 @@ function SignUpPage() {
     
     // Employee fields
     country: "",
-    timezone: "",
+    // timezone: "",
     
     // Employer fields
     organizationName: "",
@@ -331,7 +331,7 @@ function SignUpPage() {
                         />
                       </motion.div>
 
-                      <motion.div variants={itemVariants}>
+                      {/* <motion.div variants={itemVariants}>
                         <Input
                           label="Time Zone"
                           placeholder="Select your time zone"
@@ -339,7 +339,7 @@ function SignUpPage() {
                           onChange={(e) => handleInputChange("timezone", e.target.value)}
                           required
                         />
-                      </motion.div>
+                      </motion.div> */}
                     </>
                   )}
 

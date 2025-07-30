@@ -1,203 +1,424 @@
 "use client"
 
-import Layout from "../components/layout/Layout"
-import Card from "../components/Card"
-import Button from "../components/Button"
+import { useState, useEffect } from "react"
+import { motion, useScroll, useTransform } from "framer-motion"
+import Layout from '../components/layout/Layout'
+import Card from '@/components/Card'
+import Button from '@/components/Button'
 
-export default function Home() {
+function HomePage() {
+  const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const { scrollY } = useScroll()
+  const y1 = useTransform(scrollY, [0, 300], [0, -50])
+  const y2 = useTransform(scrollY, [0, 300], [0, -100])
+
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      role: "HR Director",
+      company: "TechCorp Inc.",
+      content: "SunLighter has revolutionized our hiring process. What used to take weeks now takes minutes.",
+      avatar: "👩‍💼"
+    },
+    {
+      name: "Marcus Johnson",
+      role: "Recruiting Manager",
+      company: "StartupXYZ",
+      content: "The privacy-first approach gives our candidates confidence while giving us the verification we need.",
+      avatar: "👨‍💼"
+    },
+    {
+      name: "Elena Rodriguez",
+      role: "People Operations",
+      company: "Global Solutions",
+      content: "Finally, a solution that respects both employer needs and employee privacy. Absolutely brilliant!",
+      avatar: "👩‍💻"
+    }
+  ]
+
   const features = [
     {
+      icon: "🔐",
       title: "Privacy-First Verification",
-      description: "Your employment data stays secure with one-time verification codes that expire in 5 minutes.",
-      icon: (
-        <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-          />
-        </svg>
-      ),
+      description: "Employees control their data with time-limited access codes and approval systems."
     },
     {
+      icon: "⚡",
       title: "Instant Verification",
-      description: "Generate secure codes instantly and share them with employers for immediate verification.",
-      icon: (
-        <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
-      ),
+      description: "Get employment status verification in seconds, not days or weeks."
     },
     {
-      title: "Employment Dashboard",
-      description: "Manage all your employment records in one place with verification status tracking.",
-      icon: (
-        <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-          />
-        </svg>
-      ),
+      icon: "🛡️",
+      title: "Secure & Compliant",
+      description: "Enterprise-grade security with full GDPR and SOC 2 compliance."
     },
+    {
+      icon: "🌐",
+      title: "Easy Integration",
+      description: "Simple API integration with your existing HR systems and workflows."
+    },
+    {
+      icon: "📊",
+      title: "Complete Audit Trail",
+      description: "Full transparency with detailed logs and compliance reports."
+    },
+    {
+      icon: "🤝",
+      title: "Win-Win Solution",
+      description: "Benefits both employers and employees with mutual trust and transparency."
+    }
   ]
 
-  const howItWorks = [
-    {
-      step: "1",
-      title: "Register Your Account",
-      description: "Create your secure SunLighter profile with basic information.",
-    },
-    {
-      step: "2",
-      title: "Add Employment Records",
-      description: "Add your current and past employment information to your dashboard.",
-    },
-    {
-      step: "3",
-      title: "Generate Verification Codes",
-      description: "Create one-time codes when employers need to verify your employment.",
-    },
-    {
-      step: "4",
-      title: "Share Securely",
-      description: "Share the code with employers who can instantly verify your status.",
-    },
+  const stats = [
+    { number: "10,000+", label: "Verified Employees" },
+    { number: "500+", label: "Partner Companies" },
+    { number: "99.9%", label: "Uptime" },
+    { number: "< 2 sec", label: "Average Response" }
   ]
 
-  const handleGetStarted = () => {
-    window.location.href = "/signup"
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        staggerChildren: 0.1
+      }
+    }
   }
 
-  const handleCompanyRegister = () => {
-    window.location.href = "/signup"
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: "easeOut" }
+    }
   }
 
-  const handleVerifyEmployee = () => {
-    window.location.href = "/employer/verify"
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.4, ease: "easeOut" }
+    }
   }
 
-  const handleViewDemo = () => {
-    window.location.href = "/dashboard"
+  const buttonVariants = {
+    hover: { scale: 1.05, transition: { duration: 0.2 } },
+    tap: { scale: 0.95 }
   }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [testimonials.length])
 
   return (
     <Layout title="SunLighter - Privacy-First Employment Verification">
-      <div className="space-y-16">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Hero Section */}
-        <div className="text-center max-w-4xl mx-auto">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">Privacy-First Employment Verification</h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            SunLighter provides secure, instant employment verification without compromising your privacy. Generate
-            one-time codes to share your employment status with trusted parties.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={handleGetStarted} className="px-8 py-4 text-lg">
-              Get Started as Employee
-            </Button>
-            <Button variant="outline" onClick={handleCompanyRegister} className="px-8 py-4 text-lg bg-transparent">
-              Register Your Company
-            </Button>
+        <motion.section className="relative overflow-hidden py-10 lg:py-15" variants={itemVariants}>
+          <motion.div style={{ y: y1 }} className="absolute inset-0 z-0">
+            <div className="absolute top-10 left-10 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+            <div className="absolute top-20 right-10 w-72 h-72 bg-purple-100 rounded-full mix-blend-multiply filter blur-xl opacity-70"></div>
+          </motion.div>
+          
+          <div className="relative z-10 text-center max-w-4xl mx-auto">
+            <motion.h1 
+              className="text-5xl md:text-7xl font-bold text-gray-900 mb-6"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              Employment Verification
+              <span className="block text-blue-600">Made Simple</span>
+            </motion.h1>
+            
+            <motion.p 
+              className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            >
+              The privacy-first platform that gives employees control over their data while providing employers with instant, secure verification.
+            </motion.p>
+            
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+            >
+              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                <Button 
+                  className="px-8 py-4 text-lg"
+                  onClick={() => window.location.href = '/signup'}
+                >
+                  Start Free Trial
+                </Button>
+              </motion.div>
+              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                <Button 
+                  variant="outline" 
+                  className="px-8 py-4 text-lg"
+                  onClick={() => window.location.href = '/contact'}
+                >
+                  Schedule Demo
+                </Button>
+              </motion.div>
+            </motion.div>
+            
+            <motion.p 
+              className="text-sm text-gray-500 mt-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              No credit card required • Setup in 5 minutes
+            </motion.p>
           </div>
-        </div>
+        </motion.section>
+
+        {/* Stats Section */}
+        <motion.section className="py-10 bg-gray-50 rounded-2xl" variants={itemVariants}>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Trusted by Industry Leaders</h2>
+            <p className="text-gray-600">Join thousands of companies and employees who trust SunLighter</p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                className="text-center"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">{stat.number}</div>
+                <div className="text-gray-600">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
 
         {/* Features Section */}
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose SunLighter?</h2>
-            <p className="text-lg text-gray-600">Built with privacy and security at its core</p>
+        <motion.section className="py-20" variants={itemVariants}>
+          <div className="text-center mb-16">
+            <motion.h2 
+              className="text-4xl font-bold text-gray-900 mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              Why Choose SunLighter?
+            </motion.h2>
+            <motion.p 
+              className="text-xl text-gray-600 max-w-3xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              Built for the modern workforce with privacy, security, and ease of use at its core.
+            </motion.p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                variants={cardVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              >
+                <Card className="p-6 h-full hover:shadow-lg transition-shadow">
+                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                  <p className="text-gray-600">{feature.description}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* How It Works */}
+        <motion.section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl" variants={itemVariants}>
+          <div className="text-center mb-16">
+            <motion.h2 
+              className="text-4xl font-bold text-gray-900 mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              How It Works
+            </motion.h2>
+            <motion.p 
+              className="text-xl text-gray-600"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+            >
+              Simple, secure, and straightforward
+            </motion.p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="p-6 text-center">
-                <div className="flex justify-center mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
-              </Card>
+            {[
+              {
+                step: "01",
+                title: "Employee Creates Code",
+                description: "Employees generate time-limited verification codes with full control over access and duration.",
+                icon: "👤"
+              },
+              {
+                step: "02", 
+                title: "Employer Verifies",
+                description: "Employers enter the code to instantly access verified employment information securely.",
+                icon: "🔍"
+              },
+              {
+                step: "03",
+                title: "Complete Transparency",
+                description: "Both parties get full audit trails and notifications for complete transparency and trust.",
+                icon: "📋"
+              }
+            ].map((step, index) => (
+              <motion.div
+                key={index}
+                className="text-center"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+              >
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-lg">
+                    <span className="text-2xl">{step.icon}</span>
+                  </div>
+                  <div className="absolute -top-2 right-2 bg-blue-600 text-white text-sm font-bold w-8 h-8 rounded-full flex items-center justify-center">
+                    {step.step}
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{step.title}</h3>
+                <p className="text-gray-600 px-2">{step.description}</p>
+              </motion.div>
             ))}
           </div>
-        </div>
+        </motion.section>
 
-        {/* How It Works Section */}
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-lg text-gray-600">Simple, secure employment verification in 4 steps</p>
+        {/* Testimonials */}
+        <motion.section className="py-20" variants={itemVariants}>
+          <div className="text-center mb-6">
+            <motion.h2 
+              className="text-4xl font-bold text-gray-900 mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              What Our Users Say
+            </motion.h2>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {howItWorks.map((item, index) => (
-              <div key={index} className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-                  {item.step}
-                </div>
+          <div className="max-w-3xl mx-auto">
+            <motion.div
+              key={currentTestimonial}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Card className="p-8 text-center">
+                <div className="text-6xl mb-4">{testimonials[currentTestimonial].avatar}</div>
+                <blockquote className="text-xl text-gray-700 mb-6 italic">
+                  "{testimonials[currentTestimonial].content}"
+                </blockquote>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
+                  <div className="font-semibold text-gray-900">{testimonials[currentTestimonial].name}</div>
+                  <div className="text-gray-600">{testimonials[currentTestimonial].role} at {testimonials[currentTestimonial].company}</div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              </Card>
+            </motion.div>
 
-        {/* For Employers Section */}
-        <Card className="max-w-4xl mx-auto p-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">For Employers</h2>
-            <p className="text-lg text-gray-600 mb-6">
-              Instantly verify employee information with secure one-time codes
-            </p>
-            <div className="grid md:grid-cols-2 gap-8 text-left">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Quick Verification</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li>• Enter employee-provided verification codes</li>
-                  <li>• Get instant employment status confirmation</li>
-                  <li>• View authorized employment details</li>
-                  <li>• No lengthy verification processes</li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Secure & Private</h3>
-                <ul className="space-y-2 text-gray-600">
-                  <li>• Codes expire in 5 minutes for security</li>
-                  <li>• Single-use verification codes</li>
-                  <li>• Employee controls what information is shared</li>
-                  <li>• GDPR and privacy compliant</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-8">
-              <Button onClick={handleVerifyEmployee} className="mr-4 py-2">
-                Verify Employee Now
-              </Button>
-              <Button variant="outline" onClick={handleCompanyRegister} className="py-2">
-                Register Your Company
-              </Button>
+            <div className="flex justify-center mt-6 space-x-2">
+              {testimonials.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentTestimonial(index)}
+                  className={`w-3 h-3 rounded-full transition-colors ${
+                    index === currentTestimonial ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                />
+              ))}
             </div>
           </div>
-        </Card>
+        </motion.section>
 
         {/* CTA Section */}
-        <div className="text-center max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Get Started?</h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Join thousands of professionals who trust SunLighter for secure employment verification
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={handleGetStarted} className="px-8 py-4 text-lg">
-              Create Your Account
-            </Button>
-            <Button variant="outline" onClick={handleViewDemo} className="px-8 py-4 text-lg bg-transparent">
-              View Demo Dashboard
-            </Button>
-          </div>
-        </div>
-      </div>
+        <motion.section 
+          className="py-10 mt-20 bg-gradient-to-r from-sky-500 to-blue-700 rounded-2xl text-white text-center"
+          variants={itemVariants}
+          style={{ y: y2 }}
+        >
+          <motion.h2 
+            className="text-4xl md:text-5xl font-bold mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            Ready to Transform Your Hiring?
+          </motion.h2>
+          <motion.p 
+            className="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto px-2"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            Join the privacy-first revolution in employment verification. Start your free trial today.
+          </motion.p>
+          <motion.div 
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+          >
+            <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+              <Button 
+                className="bg-green-600 hover:bg-green-700 px-8 py-4 text-lg"
+                onClick={() => window.location.href = '/signup'}
+              >
+                Start Free Trial
+              </Button>
+            </motion.div>
+            <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+              <Button 
+                variant="outline" 
+                className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg"
+                onClick={() => window.location.href = '/contact'}
+              >
+                Talk to Sales
+              </Button>
+            </motion.div>
+          </motion.div>
+        </motion.section>
+      </motion.div>
     </Layout>
   )
 }
+
+export default HomePage
