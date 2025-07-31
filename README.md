@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="/letter.png" alt="SunLighter Logo" width="120" height="120" />
+  <img src="public/letter.png" alt="SunLighter Logo" width="120" height="120" />
 </p>
 
 # 🌞 SunLighter
