@@ -68,6 +68,41 @@ function EmployeeDashboard() {
 
   const [showCodeModal, setShowCodeModal] = useState(false)
   const [generatedCode, setGeneratedCode] = useState("")
+  const [showEmploymentModal, setShowEmploymentModal] = useState(false)
+  const [newEmploymentForm, setNewEmploymentForm] = useState({
+    company: "",
+    role: "",
+    joiningDate: "",
+    location: "",
+    employmentType: "Full-time",
+    department: "",
+    salary: ""
+  })
+
+  const [employmentHistory, setEmploymentHistory] = useState([
+    {
+      id: 1,
+      company: "Tech Corp Inc.",
+      role: "Senior Software Developer",
+      joiningDate: "2023-01-15",
+      endDate: null, // null means current job
+      location: "San Francisco, CA",
+      employmentType: "Full-time",
+      department: "Engineering",
+      isCurrent: true
+    },
+    {
+      id: 2,
+      company: "StartupXYZ",
+      role: "Software Developer",
+      joiningDate: "2021-06-01",
+      endDate: "2022-12-31",
+      location: "New York, NY",
+      employmentType: "Full-time",
+      department: "Product",
+      isCurrent: false
+    }
+  ])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -146,12 +181,69 @@ function EmployeeDashboard() {
     // You could add a toast notification here
   }
 
+  const addEmployment = () => {
+    const newEmployment = {
+      id: Date.now(),
+      ...newEmploymentForm,
+      isCurrent: true
+    }
+    
+    // Mark previous current employment as ended
+    setEmploymentHistory(prev => 
+      prev.map(emp => 
+        emp.isCurrent ? { ...emp, isCurrent: false, endDate: new Date().toISOString().split('T')[0] } : emp
+      )
+    )
+    
+    // Add new employment
+    setEmploymentHistory(prev => [newEmployment, ...prev])
+    
+    // Update current employment for overview
+    setCurrentEmployment({
+      company: newEmploymentForm.company,
+      role: newEmploymentForm.role,
+      joiningDate: newEmploymentForm.joiningDate,
+      location: newEmploymentForm.location
+    })
+    
+    // Reset form and close modal
+    setNewEmploymentForm({
+      company: "",
+      role: "",
+      joiningDate: "",
+      location: "",
+      employmentType: "Full-time",
+      department: "",
+      salary: ""
+    })
+    setShowEmploymentModal(false)
+  }
+
+  const markAsCurrentJob = (employmentId) => {
+    setEmploymentHistory(prev => 
+      prev.map(emp => {
+        if (emp.id === employmentId) {
+          // Update current employment for overview
+          setCurrentEmployment({
+            company: emp.company,
+            role: emp.role,
+            joiningDate: emp.joiningDate,
+            location: emp.location
+          })
+          return { ...emp, isCurrent: true, endDate: null }
+        } else {
+          return { ...emp, isCurrent: false, endDate: emp.endDate || new Date().toISOString().split('T')[0] }
+        }
+      })
+    )
+  }
+
   const tabs = [
     { id: 'overview', name: 'Overview', icon: '📊' },
     { id: 'codes', name: 'Verification Codes', icon: '🔐' },
     { id: 'history', name: 'Access History', icon: '📋' },
-    // { id: 'privacy', name: 'Privacy Settings', icon: '🛡️' },
-    // { id: 'employment', name: 'Employment History', icon: '💼' },
+    { id: 'employment', name: 'Employment', icon: '�' },
+    // { id: 'privacy', name: 'Privacy Settings', icon: '�️' },
     // { id: 'settings', name: 'Account Settings', icon: '⚙️' }
   ]
 
@@ -372,11 +464,11 @@ function EmployeeDashboard() {
                       onChange={(e) => setNewCodeForm(prev => ({ ...prev, purpose: e.target.value }))}
                     />
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Duration</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Duration</label>
                       <select
                         value={newCodeForm.expiry}
                         onChange={(e) => setNewCodeForm(prev => ({ ...prev, expiry: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-3 text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="24h">24 Hours</option>
                         <option value="7d">7 Days</option>
@@ -536,6 +628,96 @@ function EmployeeDashboard() {
             </motion.div>
           )}
 
+          {activeTab === 'employment' && (
+            <motion.div
+              key="employment"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="space-y-6"
+            >
+              {/* Add New Employment */}
+              <motion.div variants={itemVariants}>
+                <Card className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-gray-900">Employment History</h2>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <Button 
+                        onClick={() => setShowEmploymentModal(true)}
+                        className="py-2"
+                      >
+                        Add New Employment
+                      </Button>
+                    </motion.div>
+                  </div>
+                  <p className="text-gray-600 mb-6">Manage your employment history and current job status</p>
+                  
+                  {/* Employment List */}
+                  <div className="space-y-4">
+                    {employmentHistory.map((employment, index) => (
+                      <motion.div
+                        key={employment.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`border rounded-lg p-4 ${
+                          employment.isCurrent ? 'border-green-200 bg-green-50' : 'border-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <h3 className="text-lg font-semibold text-gray-900">{employment.role}</h3>
+                              {employment.isCurrent && (
+                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                  Current
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-blue-600 font-medium mb-2">{employment.company}</p>
+                            <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
+                              <div>
+                                <span className="font-medium">Duration:</span> {employment.joiningDate} - {employment.endDate || 'Present'}
+                              </div>
+                              <div>
+                                <span className="font-medium">Location:</span> {employment.location}
+                              </div>
+                              <div>
+                                <span className="font-medium">Type:</span> {employment.employmentType}
+                              </div>
+                              {employment.department && (
+                                <div>
+                                  <span className="font-medium">Department:</span> {employment.department}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col space-y-2">
+                            {!employment.isCurrent && (
+                              <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => markAsCurrentJob(employment.id)}
+                                className="text-sm cursor-pointer text-blue-600 hover:text-blue-800"
+                              >
+                                Mark as Current
+                              </motion.button>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </Card>
+              </motion.div>
+            </motion.div>
+          )}
+
           {/* Add other tab contents here... */}
         </AnimatePresence>
 
@@ -543,19 +725,19 @@ function EmployeeDashboard() {
         <AnimatePresence>
           {showCodeModal && (
             <motion.div
-              className="fixed inset-0 z-50 overflow-y-auto"
+              className="fixed inset-0 z-50 bg-black/40 overflow-y-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
               <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <motion.div
-                  className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                {/* <motion.div
+                  className="fixed inset-0 transition-opacity"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setShowCodeModal(false)}
-                />
+                /> */}
 
                 <motion.div
                   className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
@@ -586,17 +768,17 @@ function EmployeeDashboard() {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={() => copyToClipboard(generatedCode)}
-                          className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                          className="inline-flex cursor-pointer items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                         >
-                          📋 Copy Code
+                          Copy Code
                         </motion.button>
-                        <motion.button
+                        {/* <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                         >
                           📱 Show QR
-                        </motion.button>
+                        </motion.button> */}
                       </div>
                     </div>
                   </div>
@@ -608,6 +790,121 @@ function EmployeeDashboard() {
                       className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm"
                     >
                       Done
+                    </motion.button>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Add Employment Modal */}
+        <AnimatePresence>
+          {showEmploymentModal && (
+            <motion.div
+              className="fixed inset-0 z-50 bg-black/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                {/* <motion.div
+                  className="fixed inset-0  transition-opacity"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setShowEmploymentModal(false)}
+                /> */}
+
+                <motion.div
+                  className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full"
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                >
+                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div className="mb-4">
+                      <h3 className="text-lg leading-6 font-medium text-gray-900 mb-2">
+                         Add New Employment
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Congratulations on your new job! Add your employment details to keep your profile updated.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Input
+                          label="Company Name"
+                          placeholder="e.g., Google Inc."
+                          value={newEmploymentForm.company}
+                          onChange={(e) => setNewEmploymentForm(prev => ({ ...prev, company: e.target.value }))}
+                        />
+                        <Input
+                          label="Job Title"
+                          placeholder="e.g., Senior Software Engineer"
+                          value={newEmploymentForm.role}
+                          onChange={(e) => setNewEmploymentForm(prev => ({ ...prev, role: e.target.value }))}
+                        />
+                      </div>
+                      
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <Input
+                          label="Start Date"
+                          type="date"
+                          value={newEmploymentForm.joiningDate}
+                          onChange={(e) => setNewEmploymentForm(prev => ({ ...prev, joiningDate: e.target.value }))}
+                        />
+                        <Input
+                          label="Location"
+                          placeholder="e.g., San Francisco, CA"
+                          value={newEmploymentForm.location}
+                          onChange={(e) => setNewEmploymentForm(prev => ({ ...prev, location: e.target.value }))}
+                        />
+                      </div>
+                      
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Employment Type</label>
+                          <select
+                            value={newEmploymentForm.employmentType}
+                            onChange={(e) => setNewEmploymentForm(prev => ({ ...prev, employmentType: e.target.value }))}
+                            className="w-full px-3 py-3 border text-gray-900 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          >
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Freelance">Freelance</option>
+                            <option value="Internship">Internship</option>
+                          </select>
+                        </div>
+                        <Input
+                          label="Department (Optional)"
+                          placeholder="e.g., Engineering, Marketing"
+                          value={newEmploymentForm.department}
+                          onChange={(e) => setNewEmploymentForm(prev => ({ ...prev, department: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={addEmployment}
+                      disabled={!newEmploymentForm.company || !newEmploymentForm.role || !newEmploymentForm.joiningDate}
+                      className="w-full cursor-pointer inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-emerald-600 text-base font-medium text-white hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                      Add Employment
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setShowEmploymentModal(false)}
+                      className="mt-3 w-full cursor-pointer inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm"
+                    >
+                      Cancel
                     </motion.button>
                   </div>
                 </motion.div>
