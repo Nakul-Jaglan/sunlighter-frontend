@@ -2,62 +2,27 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useAuth } from '../../contexts/AuthContext'
+import { employment, verification } from '../../services/api'
 import Layout from '../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
 
 function EmployeeDashboard() {
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
   const [activeTab, setActiveTab] = useState('overview')
-  const [employmentStatus, setEmploymentStatus] = useState(true) // true = employed, false = not employed
-  const [currentEmployment, setCurrentEmployment] = useState({
-    company: "Tech Corp Inc.",
-    role: "Senior Software Developer",
-    joiningDate: "2023-01-15",
-    location: "San Francisco, CA"
-  })
-
-  const [verificationCodes, setVerificationCodes] = useState([
-    {
-      id: 1,
-      code: "SL-9A7G-K1P4",
-      purpose: "Job Application - Google",
-      createdOn: "2025-01-28",
-      expiresIn: "2 days",
-      status: "Active",
-      usageCount: 0,
-      maxUsage: 3
-    },
-    {
-      id: 2,
-      code: "SL-3K9M-L8B2",
-      purpose: "Background Check - Meta",
-      createdOn: "2025-01-25",
-      expiresIn: "Expired",
-      status: "Expired",
-      usageCount: 1,
-      maxUsage: 1
-    }
-  ])
-
-  const [accessHistory, setAccessHistory] = useState([
-    {
-      id: 1,
-      employer: "Microsoft HR",
-      timestamp: "2025-01-28 14:30",
-      codeUsed: "SL-9A7G-K1P4",
-      location: "Seattle, WA",
-      authorized: true
-    },
-    {
-      id: 2,
-      employer: "Meta Recruiting",
-      timestamp: "2025-01-25 09:15",
-      codeUsed: "SL-3K9M-L8B2",
-      location: "Menlo Park, CA",
-      authorized: true
-    }
-  ])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+  
+  // State for API data
+  const [employments, setEmployments] = useState([])
+  const [verificationCodes, setVerificationCodes] = useState([])
+  const [accessHistory, setAccessHistory] = useState([])
+  
+  // Computed values
+  const currentEmployment = employments.find(emp => emp.isCurrent) || null
+  const employmentStatus = !!currentEmployment
 
   const [newCodeForm, setNewCodeForm] = useState({
     purpose: "",
@@ -79,30 +44,64 @@ function EmployeeDashboard() {
     salary: ""
   })
 
-  const [employmentHistory, setEmploymentHistory] = useState([
-    {
-      id: 1,
-      company: "Tech Corp Inc.",
-      role: "Senior Software Developer",
-      joiningDate: "2023-01-15",
-      endDate: null, // null means current job
-      location: "San Francisco, CA",
-      employmentType: "Full-time",
-      department: "Engineering",
-      isCurrent: true
-    },
-    {
-      id: 2,
-      company: "StartupXYZ",
-      role: "Software Developer",
-      joiningDate: "2021-06-01",
-      endDate: "2022-12-31",
-      location: "New York, NY",
-      employmentType: "Full-time",
-      department: "Product",
-      isCurrent: false
+  // Helper functions for employment type mapping
+  const employmentTypeToBackend = {
+    'Full-time': 'full_time',
+    'Part-time': 'part_time',
+    'Contract': 'contract',
+    'Freelance': 'freelance',
+    'Internship': 'internship'
+  }
+  
+  const employmentTypeToDisplay = {
+    'full_time': 'Full-time',
+    'part_time': 'Part-time',
+    'contract': 'Contract',
+    'freelance': 'Freelance',
+    'internship': 'Internship'
+  }
+
+  // Data loading effect
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      loadDashboardData()
     }
-  ])
+  }, [authLoading, isAuthenticated])
+
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      // Load data in parallel
+      const [employmentsData, codesData, logsData] = await Promise.all([
+        employment.getAll(),
+        verification.getCodes(),
+        verification.getAccessLogs()
+      ])
+
+      // Map employment types to display format
+      const mappedEmployments = employmentsData.map(emp => ({
+        ...emp,
+        employmentType: employmentTypeToDisplay[emp.employment_type] || emp.employment_type,
+        company: emp.company_name,
+        role: emp.job_title,  // Changed from 'position' to 'job_title'
+        joiningDate: emp.start_date,
+        location: emp.company_location,  // Changed to 'company_location'
+        endDate: emp.end_date,
+        isCurrent: emp.employment_status === 'current'  // Check employment_status instead of is_current
+      }))
+
+      setEmployments(mappedEmployments)
+      setVerificationCodes(codesData)
+      setAccessHistory(logsData)
+    } catch (error) {
+      console.error('Failed to load dashboard data:', error)
+      setError(error.message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -138,42 +137,73 @@ function EmployeeDashboard() {
     active: { color: "#3B82F6" }
   }
 
-  const generateCode = () => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    const segments = []
-    for (let i = 0; i < 3; i++) {
-      let segment = ''
-      for (let j = 0; j < 4; j++) {
-        segment += characters.charAt(Math.floor(Math.random() * characters.length))
+  const generateCode = async () => {
+    try {
+      // Get current employment for employment_id
+      const currentEmp = employments.find(emp => emp.isCurrent)
+      if (!currentEmp) {
+        setError('You need to have a current employment to generate verification codes.')
+        return
       }
-      segments.push(segment)
+
+      // Calculate expiry datetime
+      const hoursToAdd = newCodeForm.expiry === '24h' ? 24 : newCodeForm.expiry === '7d' ? 168 : 720
+      const expiryDate = new Date()
+      expiryDate.setHours(expiryDate.getHours() + hoursToAdd)
+
+      const codeData = {
+        purpose: newCodeForm.purpose,
+        employment_id: currentEmp.id,
+        expires_at: expiryDate.toISOString(),
+        max_usage_count: newCodeForm.maxUsage,
+        require_approval: newCodeForm.requireApproval
+      }
+
+      const newCode = await verification.createCode(codeData)
+      setGeneratedCode(newCode.code)
+      setShowCodeModal(true)
+      setNewCodeForm({ purpose: "", expiry: "24h", maxUsage: 3, requireApproval: false })
+      
+      // Refresh codes list
+      await loadVerificationCodes()
+    } catch (error) {
+      console.error('Failed to generate code:', error)
+      setError(error.message)
     }
-    const code = `SL-${segments.join('-')}`
-    setGeneratedCode(code)
-    
-    // Add to codes list
-    const newCode = {
-      id: Date.now(),
-      code,
-      purpose: newCodeForm.purpose,
-      createdOn: new Date().toISOString().split('T')[0],
-      expiresIn: newCodeForm.expiry === '24h' ? '1 day' : newCodeForm.expiry === '7d' ? '7 days' : '30 days',
-      status: 'Active',
-      usageCount: 0,
-      maxUsage: newCodeForm.maxUsage
-    }
-    
-    setVerificationCodes(prev => [newCode, ...prev])
-    setShowCodeModal(true)
-    setNewCodeForm({ purpose: "", expiry: "24h", maxUsage: 3, requireApproval: false })
   }
 
-  const revokeCode = (codeId) => {
-    setVerificationCodes(prev => 
-      prev.map(code => 
-        code.id === codeId ? { ...code, status: 'Revoked' } : code
+  // Helper functions to load individual data
+  const loadEmployments = async () => {
+    try {
+      const data = await employment.getAll()
+      setEmployments(data)
+    } catch (error) {
+      console.error('Failed to load employments:', error)
+    }
+  }
+
+  const loadVerificationCodes = async () => {
+    try {
+      const data = await verification.getCodes()
+      setVerificationCodes(data)
+    } catch (error) {
+      console.error('Failed to load verification codes:', error)
+    }
+  }
+
+  const revokeCode = async (codeId) => {
+    try {
+      await verification.revokeCode(codeId)
+      // Update local state
+      setVerificationCodes(prev => 
+        prev.map(code => 
+          code.id === codeId ? { ...code, status: 'revoked' } : code
+        )
       )
-    )
+    } catch (error) {
+      console.error('Failed to revoke code:', error)
+      setError('Failed to revoke verification code. Please try again.')
+    }
   }
 
   const copyToClipboard = (text) => {
@@ -181,71 +211,146 @@ function EmployeeDashboard() {
     // You could add a toast notification here
   }
 
-  const addEmployment = () => {
-    const newEmployment = {
-      id: Date.now(),
-      ...newEmploymentForm,
-      isCurrent: true
-    }
-    
-    // Mark previous current employment as ended
-    setEmploymentHistory(prev => 
-      prev.map(emp => 
-        emp.isCurrent ? { ...emp, isCurrent: false, endDate: new Date().toISOString().split('T')[0] } : emp
+  const addEmployment = async () => {
+    try {
+      // Create employment via API with correct field mapping
+      const employmentData = {
+        company_name: newEmploymentForm.company,
+        job_title: newEmploymentForm.role,  // Changed from 'position' to 'job_title'
+        start_date: newEmploymentForm.joiningDate,
+        company_location: newEmploymentForm.location,  // Changed from 'location' to 'company_location'
+        employment_type: employmentTypeToBackend[newEmploymentForm.employmentType],
+        department: newEmploymentForm.department,
+        salary_range: newEmploymentForm.salary || null,  // Changed from 'salary' to 'salary_range'
+      }
+      
+      const newEmployment = await employment.create(employmentData)
+      
+      // Map the returned employment to display format
+      const mappedNewEmployment = {
+        ...newEmployment,
+        employmentType: employmentTypeToDisplay[newEmployment.employment_type] || newEmployment.employment_type,
+        company: newEmployment.company_name,
+        role: newEmployment.job_title,  // Changed from 'position' to 'job_title'
+        joiningDate: newEmployment.start_date,
+        location: newEmployment.company_location,  // Changed to 'company_location'
+        endDate: newEmployment.end_date,
+        isCurrent: newEmployment.employment_status === 'current'  // Check employment_status
+      }
+      
+      // Mark previous current employment as ended
+      setEmployments(prev => 
+        prev.map(emp => 
+          emp.isCurrent ? { ...emp, isCurrent: false, endDate: new Date().toISOString().split('T')[0] } : emp
+        )
       )
-    )
-    
-    // Add new employment
-    setEmploymentHistory(prev => [newEmployment, ...prev])
-    
-    // Update current employment for overview
-    setCurrentEmployment({
-      company: newEmploymentForm.company,
-      role: newEmploymentForm.role,
-      joiningDate: newEmploymentForm.joiningDate,
-      location: newEmploymentForm.location
-    })
-    
-    // Reset form and close modal
-    setNewEmploymentForm({
-      company: "",
-      role: "",
-      joiningDate: "",
-      location: "",
-      employmentType: "Full-time",
-      department: "",
-      salary: ""
-    })
-    setShowEmploymentModal(false)
+      
+      // Add new employment to local state
+      setEmployments(prev => [mappedNewEmployment, ...prev])
+      
+      // Reset form and close modal
+      setNewEmploymentForm({
+        company: "",
+        role: "",
+        joiningDate: "",
+        location: "",
+        employmentType: "Full-time",
+        department: "",
+        salary: ""
+      })
+      setShowEmploymentModal(false)
+    } catch (error) {
+      console.error('Failed to add employment:', error)
+      setError('Failed to add employment. Please try again.')
+    }
   }
 
-  const markAsCurrentJob = (employmentId) => {
-    setEmploymentHistory(prev => 
-      prev.map(emp => {
-        if (emp.id === employmentId) {
-          // Update current employment for overview
-          setCurrentEmployment({
-            company: emp.company,
-            role: emp.role,
-            joiningDate: emp.joiningDate,
-            location: emp.location
-          })
-          return { ...emp, isCurrent: true, endDate: null }
-        } else {
-          return { ...emp, isCurrent: false, endDate: emp.endDate || new Date().toISOString().split('T')[0] }
-        }
-      })
-    )
+  const markAsCurrentJob = async (employmentId) => {
+    try {
+      await employment.setCurrentEmployment(employmentId)  // Changed from setCurrent to setCurrentEmployment
+      
+      setEmployments(prev => 
+        prev.map(emp => {
+          if (emp.id === employmentId) {
+            return { ...emp, isCurrent: true, endDate: null }
+          } else {
+            return { ...emp, isCurrent: false, endDate: emp.endDate || new Date().toISOString().split('T')[0] }
+          }
+        })
+      )
+    } catch (error) {
+      console.error('Failed to set current employment:', error)
+      setError('Failed to update current employment. Please try again.')
+    }
+  }
+
+  const deleteEmployment = async (employmentId) => {
+    try {
+      await employment.delete(employmentId)
+      
+      // Remove from local state
+      setEmployments(prev => prev.filter(emp => emp.id !== employmentId))
+    } catch (error) {
+      console.error('Failed to delete employment:', error)
+      setError('Failed to delete employment. Please try again.')
+    }
   }
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: '📊' },
     { id: 'codes', name: 'Verification Codes', icon: '🔐' },
     { id: 'history', name: 'Access History', icon: '📋' },
-    { id: 'employment', name: 'Employment', icon: '�' },
-    // { id: 'privacy', name: 'Privacy Settings', icon: '�️' },
+    { id: 'employment', name: 'Employment', icon: '💼' },
+    // { id: 'privacy', name: 'Privacy Settings', icon: '🔒' },
     // { id: 'settings', name: 'Account Settings', icon: '⚙️' }
   ]
+
+  // Loading state
+  if (authLoading || isLoading) {
+    return (
+      <Layout title="Loading... - SunLighter">
+        <div className="max-w-7xl mx-auto py-12">
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-gray-600">Loading your dashboard...</span>
+          </div>
+        </div>
+      </Layout>
+    )
+  }
+
+  // Authentication check
+  if (!isAuthenticated) {
+    return (
+      <Layout title="Access Denied - SunLighter">
+        <div className="max-w-7xl mx-auto py-12">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in to access your dashboard</h1>
+            <Button onClick={() => window.location.href = '/login'} className="py-2">
+              Sign In
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Layout title="Dashboard Error - SunLighter">
+        <div className="max-w-7xl mx-auto py-12">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Dashboard</h1>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Button onClick={loadDashboardData} className="py-2">
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    )
+  }
 
   return (
     <Layout title="Employee Dashboard - SunLighter">
@@ -355,7 +460,7 @@ function EmployeeDashboard() {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Joining Date</label>
-                        <p className="text-gray-900">{currentEmployment.joiningDate}</p>
+                        <p className="text-gray-900">{new Date(currentEmployment.joiningDate).toLocaleDateString()}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
@@ -541,19 +646,25 @@ function EmployeeDashboard() {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{code.purpose}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{code.createdOn}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{code.expiresIn}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(code.created_at).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {new Date(code.expires_at).toLocaleDateString()}
+                            </td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                code.status === 'Active' ? 'bg-green-100 text-green-800' :
-                                code.status === 'Expired' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-red-100 text-red-800'
+                                code.status === 'active' ? 'bg-green-100 text-green-800' :
+                                code.status === 'expired' ? 'bg-yellow-100 text-yellow-800' :
+                                code.status === 'revoked' ? 'bg-red-100 text-red-800' :
+                                code.status === 'used' ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800'
                               }`}>
-                                {code.status}
+                                {code.status.charAt(0).toUpperCase() + code.status.slice(1)}
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {code.status === 'Active' && (
+                              {code.status === 'active' && (
                                 <motion.button
                                   whileHover={{ scale: 1.05 }}
                                   whileTap={{ scale: 0.95 }}
@@ -658,7 +769,7 @@ function EmployeeDashboard() {
                   
                   {/* Employment List */}
                   <div className="space-y-4">
-                    {employmentHistory.map((employment, index) => (
+                    {employments.map((employment, index) => (
                       <motion.div
                         key={employment.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -681,7 +792,7 @@ function EmployeeDashboard() {
                             <p className="text-blue-600 font-medium mb-2">{employment.company}</p>
                             <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
                               <div>
-                                <span className="font-medium">Duration:</span> {employment.joiningDate} - {employment.endDate || 'Present'}
+                                <span className="font-medium">Duration:</span> {new Date(employment.joiningDate).toLocaleDateString()} - {employment.endDate ? new Date(employment.endDate).toLocaleDateString() : 'Present'}
                               </div>
                               <div>
                                 <span className="font-medium">Location:</span> {employment.location}
@@ -708,6 +819,14 @@ function EmployeeDashboard() {
                                 Mark as Current
                               </motion.button>
                             )}
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => deleteEmployment(employment.id)}
+                              className="text-sm cursor-pointer text-red-600 hover:text-red-800"
+                            >
+                              Delete
+                            </motion.button>
                           </div>
                         </div>
                       </motion.div>
@@ -787,7 +906,7 @@ function EmployeeDashboard() {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setShowCodeModal(false)}
-                      className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm"
+                      className="w-full cursor-pointer inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm"
                     >
                       Done
                     </motion.button>

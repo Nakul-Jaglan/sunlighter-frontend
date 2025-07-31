@@ -2,12 +2,15 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useAuth } from '../../contexts/AuthContext'
+import { api } from '../../services/api'
 import Layout from '../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
 
 function SignUpPage() {
+  const { register, isLoading, error, clearError } = useAuth()
   const [userType, setUserType] = useState(null) // 'employee' or 'employer'
   const [formData, setFormData] = useState({
     // Common fields
@@ -17,7 +20,6 @@ function SignUpPage() {
     
     // Employee fields
     country: "",
-    // timezone: "",
     
     // Employer fields
     organizationName: "",
@@ -27,6 +29,7 @@ function SignUpPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [userId, setUserId] = useState(null)
   const [companyId, setCompanyId] = useState(null)
+  const [registrationError, setRegistrationError] = useState(null)
 
     // Generate userId after successful submit
     const generateUserId = () => {
@@ -48,6 +51,12 @@ function SignUpPage() {
       [field]: value,
     }))
 
+    // Clear any existing errors
+    if (error || registrationError) {
+      clearError()
+      setRegistrationError(null)
+    }
+
     // Auto-suggest company handle from organization name for employers
     if (field === "organizationName" && value.length >= 3 && userType === 'employer') {
       const suggestedHandle = value
@@ -64,11 +73,62 @@ function SignUpPage() {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setUserId(generateUserId())
-    setCompanyId(userType === 'employer' ? Math.floor(Math.random() * 900000) + 100000 : null)
-    setIsSubmitted(true)
+    setRegistrationError(null)
+    
+    try {
+      // Prepare registration data based on user type
+      let registrationData
+      
+      if (userType === 'employee') {
+        registrationData = {
+          full_name: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          user_type: 'employee',
+          location: formData.country  // Backend expects 'location' instead of 'country'
+        }
+      } else if (userType === 'employer') {
+        registrationData = {
+          full_name: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          user_type: 'employer',
+          company_name: formData.organizationName,  // Backend expects 'company_name'
+          // Note: backend doesn't have designation or company_handle in the current schema
+          // but we can store designation in location or bio for now
+          location: formData.designation
+        }
+      }
+
+      console.log('Sending registration data:', registrationData) // Debug log
+      
+      const result = await register(registrationData)
+      
+      if (result.success) {
+        setUserId(result.user.id || generateUserId())
+        setCompanyId(userType === 'employer' ? (result.user.company_id || Math.floor(Math.random() * 900000) + 100000) : null)
+        setIsSubmitted(true)
+      }
+    } catch (error) {
+      console.error('Registration error:', error)
+      
+      // Extract human-readable error message
+      let errorMessage = 'Registration failed. Please try again.'
+      
+      if (error.message) {
+        errorMessage = error.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      }
+      
+      setRegistrationError(errorMessage)
+    }
   }
 
   const handleUserTypeSelect = (type) => {
@@ -79,7 +139,7 @@ function SignUpPage() {
       email: "",
       password: "",
       country: "",
-      timezone: "",
+      // timezone: "", // Removed since it's not in the form
       organizationName: "",
       designation: "",
       companyHandle: "",
@@ -174,7 +234,10 @@ function SignUpPage() {
               </motion.div>
               <motion.div variants={itemVariants}>
                 <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                  <Button onClick={() => (window.location.href = "/dashboard")} className="py-2">
+                  <Button onClick={() => {
+                    const redirectPath = userType === 'employer' ? '/employer/dashboard' : '/dashboard'
+                    window.location.href = redirectPath
+                  }} className="py-2">
                     Go to Dashboard
                   </Button>
                 </motion.div>
@@ -296,6 +359,17 @@ function SignUpPage() {
                 </motion.div>
 
                 <motion.form onSubmit={handleSubmit} className="space-y-6" variants={itemVariants}>
+                  {/* Error Display */}
+                  {(error || registrationError) && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md"
+                    >
+                      {error || registrationError}
+                    </motion.div>
+                  )}
+
                   {/* Common Fields */}
                   <motion.div variants={itemVariants}>
                     <Input
@@ -395,8 +469,19 @@ function SignUpPage() {
 
                   <motion.div variants={itemVariants}>
                     <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                      <Button type="submit" className="w-full py-3">
-                        Create {userType === 'employee' ? 'Employee' : 'Employer'} Account
+                      <Button 
+                        type="submit" 
+                        className="w-full py-3"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <div className="flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                            Creating Account...
+                          </div>
+                        ) : (
+                          `Create ${userType === 'employee' ? 'Employee' : 'Employer'} Account`
+                        )}
                       </Button>
                     </motion.div>
                   </motion.div>

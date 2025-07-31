@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useAuth } from '../../contexts/AuthContext'
 import Layout from '../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
 
 function LoginPage() {
+  const { login, isLoading, error, clearError } = useAuth()
   const [userType, setUserType] = useState(null) // 'employee' or 'employer'
   const [formData, setFormData] = useState({
     email: "",
@@ -21,15 +23,29 @@ function LoginPage() {
       ...prev,
       [field]: value,
     }))
+    // Clear any existing errors
+    if (error) {
+      clearError()
+    }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitted(true)
-    // Simulate login delay
-    setTimeout(() => {
-      window.location.href = "/dashboard"
-    }, 1500)
+    
+    try {
+      const result = await login(formData.email, formData.password)
+      
+      if (result.success) {
+        // Redirect based on user role
+        const redirectPath = result.user.role === 'employer' ? '/employer/dashboard' : '/dashboard'
+        window.location.href = redirectPath
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+    } finally {
+      setIsSubmitted(false)
+    }
   }
 
   const handleUserTypeSelect = (type) => {
@@ -263,6 +279,16 @@ function LoginPage() {
                 </motion.div>
 
                 <motion.form onSubmit={handleSubmit} className="space-y-6" variants={itemVariants}>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md"
+                    >
+                      {error}
+                    </motion.div>
+                  )}
+                  
                   <motion.div variants={itemVariants}>
                     <Input
                       label="Email Address"
@@ -304,8 +330,19 @@ function LoginPage() {
 
                   <motion.div variants={itemVariants}>
                     <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                      <Button type="submit" className="w-full py-3">
-                        Sign In as {userType === 'employee' ? 'Employee' : 'Employer'}
+                      <Button 
+                        type="submit" 
+                        className="w-full py-3"
+                        disabled={isLoading || isSubmitted}
+                      >
+                        {isLoading || isSubmitted ? (
+                          <div className="flex items-center justify-center">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                            Signing in...
+                          </div>
+                        ) : (
+                          `Sign In as ${userType === 'employee' ? 'Employee' : 'Employer'}`
+                        )}
                       </Button>
                     </motion.div>
                   </motion.div>

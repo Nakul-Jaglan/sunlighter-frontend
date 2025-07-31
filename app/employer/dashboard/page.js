@@ -1,51 +1,60 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useAuth } from '../../../contexts/AuthContext'
+import { api } from '../../../services/api'
 import Layout from '../../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
 
 function EmployerDashboard() {
+  const { user, logout } = useAuth()
   const [activeTab, setActiveTab] = useState('verify')
   const [verificationCode, setVerificationCode] = useState('')
   const [verificationResult, setVerificationResult] = useState(null)
   const [isVerifying, setIsVerifying] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  
+  // Real data from API
+  const [accessHistory, setAccessHistory] = useState([])
+  const [savedVerifications, setSavedVerifications] = useState([])
+  const [verificationRequests, setVerificationRequests] = useState([])
 
-  const [accessHistory, setAccessHistory] = useState([
-    {
-      id: 1,
-      date: "2025-01-28",
-      time: "14:30",
-      code: "SL-9A7G-K1P4",
-      employeeId: "EMP-001",
-      outcome: "Valid",
-      employeeName: "John Doe",
-      position: "Software Engineer"
-    },
-    {
-      id: 2,
-      date: "2025-01-25",
-      time: "09:15",
-      code: "SL-3K9M-L8B2",
-      employeeId: "EMP-002",
-      outcome: "Expired",
-      employeeName: "Jane Smith",
-      position: "Product Manager"
+  useEffect(() => {
+    if (!user || user.role !== 'employer') {
+      window.location.href = '/login'
+      return
     }
-  ])
+    loadDashboardData()
+  }, [user])
 
-  const [savedVerifications, setSavedVerifications] = useState([
-    {
-      id: 1,
-      employeeName: "John Doe",
-      position: "Software Engineer",
-      company: "Tech Corp Inc.",
-      verifiedOn: "2025-01-28",
-      status: "Active"
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true)
+      
+      // Load verification requests for this employer
+      const requests = await api.employer.getVerificationRequests()
+      setVerificationRequests(requests || [])
+      
+      // Load access history
+      const history = await api.admin.getAccessLogs()
+      setAccessHistory(history || [])
+      
+      // Load saved verifications (could be from completed requests)
+      const completed = requests?.filter(r => r.status === 'verified') || []
+      setSavedVerifications(completed)
+    } catch (error) {
+      console.error('Error loading dashboard data:', error)
+      // Keep empty arrays as fallback
+      setVerificationRequests([])
+      setAccessHistory([])
+      setSavedVerifications([])
+    } finally {
+      setIsLoading(false)
     }
-  ])
+  }
 
   const [requestForm, setRequestForm] = useState({
     email: '',
@@ -74,46 +83,69 @@ function EmployerDashboard() {
   }
 
   const verifyEmployee = async () => {
+    if (!verificationCode.trim()) {
+      setVerificationResult({
+        valid: false,
+        error: "Please enter a verification code"
+      })
+      return
+    }
+
     setIsVerifying(true)
     
-    // Simulate API call
-    setTimeout(() => {
-      const mockResult = {
-        valid: verificationCode === "SL-9A7G-K1P4",
+    try {
+      const result = await api.verification.verify(verificationCode.trim())
+      setVerificationResult({
+        valid: true,
         employee: {
-          name: "John Doe",
-          status: "Active",
-          role: "Senior Software Developer",
-          company: "Tech Corp Inc.",
-          joinDate: "2023-01-15",
+          name: result.employee_name,
+          status: result.status,
+          role: result.position || "Employee",
+          company: result.company_name,
+          joinDate: result.start_date,
           verifiedOn: new Date().toISOString()
         }
-      }
+      })
       
-      setVerificationResult(mockResult)
+      // Reload dashboard data to update access history
+      loadDashboardData()
+    } catch (error) {
+      console.error('Verification error:', error)
+      setVerificationResult({
+        valid: false,
+        error: error.response?.data?.detail || "Invalid verification code or verification failed"
+      })
+    } finally {
       setIsVerifying(false)
-      
-      if (mockResult.valid) {
-        // Add to access history
-        const newAccess = {
-          id: Date.now(),
-          date: new Date().toISOString().split('T')[0],
-          time: new Date().toTimeString().substr(0, 5),
-          code: verificationCode,
-          employeeId: "EMP-" + Math.random().toString(36).substr(2, 3).toUpperCase(),
-          outcome: "Valid",
-          employeeName: mockResult.employee.name,
-          position: mockResult.employee.role
-        }
-        setAccessHistory(prev => [newAccess, ...prev])
-      }
-    }, 2000)
+    }
   }
 
-  const sendVerificationRequest = () => {
-    // Simulate sending request
-    alert('Verification request sent to employee!')
-    setRequestForm({ email: '', reason: '', message: '' })
+  const handleLogout = () => {
+    logout()
+    window.location.href = '/login'
+  }
+
+  const sendVerificationRequest = async () => {
+    if (!requestForm.email.trim()) {
+      alert('Please enter an email address')
+      return
+    }
+
+    try {
+      await api.employer.sendVerificationRequest({
+        employee_email: requestForm.email,
+        reason: requestForm.reason,
+        message: requestForm.message
+      })
+      
+      alert('Verification request sent to employee!')
+      setRequestForm({ email: '', reason: '', message: '' })
+      // Reload data to show new request
+      loadDashboardData()
+    } catch (error) {
+      console.error('Error sending verification request:', error)
+      alert('Failed to send verification request. Please try again.')
+    }
   }
 
   const tabs = [
@@ -125,6 +157,19 @@ function EmployerDashboard() {
     // { id: 'settings', name: 'Account Settings', icon: '⚙️' }
   ]
 
+  if (isLoading) {
+    return (
+      <Layout title="Employer Dashboard - SunLighter">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading dashboard...</p>
+          </div>
+        </div>
+      </Layout>
+    )
+  }
+
   return (
     <Layout title="Employer Dashboard - SunLighter">
       <motion.div
@@ -135,20 +180,16 @@ function EmployerDashboard() {
       >
         {/* Header */}
         <motion.div className="mb-8" variants={itemVariants}>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-center">
-            <div className="text-center">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Employer Dashboard</h1>
-              <p className="text-gray-600 text-lg">Verify employee status and manage hiring compliance</p>
+              <p className="text-gray-600 text-lg">Welcome back, {user?.full_name}</p>
             </div>
-            {/* <div className="mt-4 md:mt-0">
-              <motion.div
-                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="w-2 h-2 rounded-full mr-2 bg-blue-500" />
-                Verified Employer
-              </motion.div>
-            </div> */}
+            <div className="mt-4 md:mt-0">
+              <Button onClick={handleLogout} className="bg-red-600 hover:bg-red-700">
+                Logout
+              </Button>
+            </div>
           </div>
         </motion.div>
 

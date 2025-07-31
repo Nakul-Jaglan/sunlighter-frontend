@@ -4,9 +4,11 @@ import { motion, useScroll, useMotionValueEvent } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect } from "react"
+import { useAuth } from "../../contexts/AuthContext"
 import Button from "../Button"
 
 const Header = () => {
+  const { user } = useAuth()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { scrollY } = useScroll()
@@ -15,9 +17,17 @@ const Header = () => {
     setIsScrolled(latest > 10)
   })
 
+  // Smart dashboard link based on user authentication and role
+  const getDashboardLink = () => {
+    if (!user) {
+      return "/signup"
+    }
+    return user.role === 'employer' ? '/employer/dashboard' : '/dashboard'
+  }
+
   const navItems = [
     { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard" },
+    // { name: "Dashboard", href: getDashboardLink() },
     { name: "Pricing", href: "/pricing" },
     { name: "Contact", href: "/contact" },
   ]
@@ -207,29 +217,58 @@ const Header = () => {
             initial="initial"
             animate="visible"
           >
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.1 }}
-            >
-              <Link
-                href="/login"
-                className="text-gray-600 text-xl hover:text-gray-900 font-medium transition-colors duration-200"
-              >
-                Log In
-              </Link>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.1 }}
-            >
-              <Button variant="primary" className="px-2 py-2">
-                <Link href="/signup" className="text-white text-xl">
-                  Sign Up
-                </Link>
-              </Button>
-            </motion.div>
+            {user ? (
+              // Logged in user
+              <>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <span className="text-gray-600 text-base">
+                    Welcome, {user.full_name}
+                  </span>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <Button variant="primary" className="px-2 py-2 cursor-pointer">
+                    <Link href={getDashboardLink()} className="text-white text-xl">
+                      Dashboard
+                    </Link>
+                  </Button>
+                </motion.div>
+              </>
+            ) : (
+              // Not logged in
+              <>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <Link
+                    href="/login"
+                    className="text-gray-600 text-xl hover:text-gray-900 font-medium transition-colors duration-200"
+                  >
+                    Log In
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.1 }}
+                >
+                  <Button variant="primary" className="px-2 py-2">
+                    <Link href="/signup" className="text-white text-xl">
+                      Sign Up
+                    </Link>
+                  </Button>
+                </motion.div>
+              </>
+            )}
           </motion.div>
 
           {/* Mobile Menu Button */}
@@ -293,20 +332,39 @@ const Header = () => {
               animate={isMobileMenuOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
               transition={{ delay: 0.3, duration: 0.2 }}
             >
-              <Link
-                href="/login"
-                className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Log In
-              </Link>
-              <div className="px-3">
-                <Button variant="primary" className="w-full px-4 py-2">
-                  <Link href="/signup" className="text-white">
-                    Sign Up
+              {user ? (
+                // Logged in user - mobile
+                <>
+                  <div className="px-3 py-2 text-sm text-gray-600">
+                    Welcome, {user.full_name}
+                  </div>
+                  <div className="px-3">
+                    <Button variant="primary" className="w-full px-4 py-2">
+                      <Link href={getDashboardLink()} className="text-white">
+                        Dashboard
+                      </Link>
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                // Not logged in - mobile
+                <>
+                  <Link
+                    href="/login"
+                    className="block px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Log In
                   </Link>
-                </Button>
-              </div>
+                  <div className="px-3">
+                    <Button variant="primary" className="w-full px-4 py-2">
+                      <Link href="/signup" className="text-white">
+                        Sign Up
+                      </Link>
+                    </Button>
+                  </div>
+                </>
+              )}
             </motion.div>
           </div>
         </motion.div>
