@@ -104,7 +104,7 @@ class ApiService {
         } else if (response.status === 409) {
           errorMessage = 'This information already exists. Please use different details.'
         } else if (response.status >= 500) {
-          errorMessage = 'Server error. Please try again later.'
+          errorMessage = 'Server error. The backend service is currently experiencing issues. Please try again later or contact support.'
         }
       } catch (parseError) {
         // If we can't parse the error response
@@ -115,7 +115,7 @@ class ApiService {
         } else if (response.status === 409) {
           errorMessage = 'Email already exists. Please use a different email address.'
         } else if (response.status >= 500) {
-          errorMessage = 'Server error. Please try again later.'
+          errorMessage = 'Backend service error. The server is experiencing technical difficulties. Please try again later.'
         } else {
           errorMessage = `Request failed (${response.status}). Please try again.`
         }
