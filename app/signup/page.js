@@ -107,8 +107,12 @@ function SignUpPage() {
       const result = await register(registrationData)
       
       if (result.success) {
-        setUserId(result.user.id || generateUserId())
-        setCompanyId(userType === 'employer' ? (result.user.company_id || Math.floor(Math.random() * 900000) + 100000) : null)
+        // Backend now generates the appropriate IDs
+        if (userType === 'employee') {
+          setUserId(result.user.user_id || 'Pending')
+        } else {
+          setCompanyId(result.user.company_handle || result.user.employer_id || 'Pending')
+        }
         setIsSubmitted(true)
       }
     } catch (error) {
@@ -228,8 +232,12 @@ function SignUpPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5, duration: 0.4 }}
                 >
-                  <p className="text-sm text-gray-600 mb-1">Your User ID is:</p>
-                  <p className="text-xl font-bold text-blue-600">{userId}</p>
+                  <p className="text-sm text-gray-600 mb-1">
+                    Your {userType === 'employee' ? 'Employee ID' : 'Company Handle'} is:
+                  </p>
+                  <p className="text-xl font-bold text-blue-600">
+                    {userType === 'employee' ? userId : `@${companyId}`}
+                  </p>
                 </motion.div>
               </motion.div>
               <motion.div variants={itemVariants}>

@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, useScroll, useMotionValueEvent } from "framer-motion"
+import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion"
 import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect } from "react"
@@ -8,9 +8,10 @@ import { useAuth } from "../../contexts/AuthContext"
 import Button from "../Button"
 
 const Header = () => {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
   const { scrollY } = useScroll()
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -22,12 +23,13 @@ const Header = () => {
     if (!user) {
       return "/signup"
     }
-    return user.role === 'employer' ? '/employer/dashboard' : '/dashboard'
+    return user.user_type === 'employer' ? '/employer/dashboard' : '/dashboard'
   }
 
   const navItems = [
     { name: "Home", href: "/" },
     // { name: "Dashboard", href: getDashboardLink() },
+    { name: "Future", href: "/future" },
     { name: "Pricing", href: "/pricing" },
     { name: "Contact", href: "/contact" },
   ]
@@ -218,29 +220,69 @@ const Header = () => {
             animate="visible"
           >
             {user ? (
-              // Logged in user
-              <>
-                <motion.div
+              // Logged in user - Profile Dropdown
+              <div className="relative">
+                <motion.button
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.1 }}
+                  className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 transition-colors duration-200"
                 >
-                  <span className="text-gray-600 text-base">
-                    Welcome, {user.full_name}
-                  </span>
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.1 }}
-                >
-                  <Button variant="primary" className="px-2 py-2 cursor-pointer">
-                    <Link href={getDashboardLink()} className="text-white text-xl">
-                      Dashboard
-                    </Link>
-                  </Button>
-                </motion.div>
-              </>
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">
+                      {user.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                  <span className="font-medium">{user.full_name}</span>
+                  {user.user_type === 'employer' && user.company_handle && (
+                    <span className="text-sm text-blue-600">@{user.company_handle}</span>
+                  )}
+                  {user.user_type === 'employee' && user.user_id && (
+                    <span className="text-sm text-green-600">#{user.user_id}</span>
+                  )}
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </motion.button>
+
+                <AnimatePresence>
+                  {showUserDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50"
+                    >
+                      <div className="py-1">
+                        <Link
+                          href={getDashboardLink()}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                          onClick={() => setShowUserDropdown(false)}
+                        >
+                          Dashboard
+                        </Link>
+                        <Link
+                          href="/profile"
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                          onClick={() => setShowUserDropdown(false)}
+                        >
+                          Profile
+                        </Link>
+                        <div className="border-t border-gray-100"></div>
+                        <button
+                          onClick={() => {
+                            logout()
+                            setShowUserDropdown(false)
+                          }}
+                          className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             ) : (
               // Not logged in
               <>
@@ -338,12 +380,25 @@ const Header = () => {
                   <div className="px-3 py-2 text-sm text-gray-600">
                     Welcome, {user.full_name}
                   </div>
-                  <div className="px-3">
+                  <div className="px-3 py-2 text-xs text-gray-500">
+                    {user.user_type === 'employer' ? (
+                      user.company_handle ? `@${user.company_handle}` : 'Employer Account'
+                    ) : (
+                      user.user_id ? `ID: ${user.user_id}` : 'Employee Account'
+                    )}
+                  </div>
+                  <div className="px-3 space-y-2">
                     <Button variant="primary" className="w-full px-4 py-2">
                       <Link href={getDashboardLink()} className="text-white">
                         Dashboard
                       </Link>
                     </Button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200 border border-gray-300"
+                    >
+                      Log Out
+                    </button>
                   </div>
                 </>
               ) : (

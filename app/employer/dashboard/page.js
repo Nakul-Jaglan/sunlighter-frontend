@@ -23,7 +23,7 @@ function EmployerDashboard() {
   const [verificationRequests, setVerificationRequests] = useState([])
 
   useEffect(() => {
-    if (!user || user.role !== 'employer') {
+    if (!user || user.user_type !== 'employer') {
       window.location.href = '/login'
       return
     }
@@ -184,6 +184,9 @@ function EmployerDashboard() {
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Employer Dashboard</h1>
               <p className="text-gray-600 text-lg">Welcome back, {user?.full_name}</p>
+              {user?.company_handle && (
+                <p className="text-blue-600 text-sm font-mono">@{user.company_handle}</p>
+              )}
             </div>
             <div className="mt-4 md:mt-0">
               <Button onClick={handleLogout} className="bg-red-600 hover:bg-red-700">
@@ -191,6 +194,34 @@ function EmployerDashboard() {
               </Button>
             </div>
           </div>
+        </motion.div>
+
+        {/* Company Information */}
+        <motion.div className="mb-8" variants={itemVariants}>
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Company Information</h2>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+                <p className="text-gray-900">{user?.company_name || 'Not specified'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company Handle</label>
+                <p className="text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded">
+                  {user?.company_handle ? `@${user.company_handle}` : 'Not assigned'}
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company Website</label>
+                <p className="text-gray-900">{user?.company_website || 'Not specified'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
+                <p className="text-gray-900">{user?.company_size || 'Not specified'}</p>
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
         {/* Navigation Tabs */}

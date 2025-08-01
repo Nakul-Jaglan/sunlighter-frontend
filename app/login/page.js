@@ -38,7 +38,7 @@ function LoginPage() {
       
       if (result.success) {
         // Redirect based on user role
-        const redirectPath = result.user.role === 'employer' ? '/employer/dashboard' : '/dashboard'
+        const redirectPath = result.user.user_type === 'employer' ? '/employer/dashboard' : '/dashboard'
         window.location.href = redirectPath
       }
     } catch (error) {

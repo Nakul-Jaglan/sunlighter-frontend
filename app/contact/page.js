@@ -18,6 +18,7 @@ function ContactPage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showThankYou, setShowThankYou] = useState(false)
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -30,16 +31,54 @@ function ContactPage() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // For development, we'll use a regular form submission
-    // FormSubmit.co doesn't work with localhost due to CORS
-    if (typeof window !== 'undefined') {
-      // Create a hidden form for submission
+    try {
+      // Submit form data via fetch to avoid redirect
+      const response = await fetch('https://formsubmit.co/ajax/jaglan.nakul@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          subject: formData.subject,
+          message: formData.message,
+          inquiry_type: formData.inquiryType,
+          _subject: `New Query on SunLighter Website: ${formData.subject}`,
+          _autoresponse: 'Thank you for contacting us! We will get back to you shortly.',
+          _template: 'table'
+        })
+      })
+
+      if (response.ok) {
+        setShowThankYou(true)
+        // Reset form
+        setFormData({
+          name: '',
+          email: '',
+          company: '',
+          subject: '',
+          message: '',
+          inquiryType: 'general'
+        })
+        
+        // Auto redirect after 10 seconds
+        setTimeout(() => {
+          window.location.href = '/'
+        }, 10000)
+      } else {
+        throw new Error('Failed to submit form')
+      }
+    } catch (error) {
+      console.error('Form submission error:', error)
+      // Fallback to the original method if AJAX fails
       const form = document.createElement('form')
       form.action = 'https://formsubmit.co/jaglan.nakul@gmail.com'
       form.method = 'POST'
       form.style.display = 'none'
 
-      // Add all form fields
       const fields = [
         { name: 'name', value: formData.name },
         { name: 'email', value: formData.email },
@@ -47,7 +86,7 @@ function ContactPage() {
         { name: 'subject', value: formData.subject },
         { name: 'message', value: formData.message },
         { name: 'inquiry_type', value: formData.inquiryType },
-        { name: '_next', value: window.location.origin },
+        { name: '_next', value: window.location.origin + '?submitted=true' },
         { name: '_subject', value: `New Query on SunLighter Website: ${formData.subject}` },
         { name: '_captcha', value: 'false' },
         { name: '_autoresponse', value: 'Thank you for contacting us! We will get back to you shortly.' },
@@ -62,9 +101,10 @@ function ContactPage() {
         form.appendChild(input)
       })
 
-      // Submit the form
       document.body.appendChild(form)
       form.submit()
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -351,7 +391,7 @@ function ContactPage() {
             </motion.div> */}
 
             {/* FAQ Quick Links */}
-            <motion.div variants={cardVariants}>
+            {/* <motion.div variants={cardVariants}>
               <Card className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Quick Help</h3>
                 <div className="space-y-2">
@@ -374,7 +414,7 @@ function ContactPage() {
                   ))}
                 </div>
               </Card>
-            </motion.div>
+            </motion.div> */}
           </motion.div>
         </div>
 
@@ -400,6 +440,79 @@ function ContactPage() {
           </Card>
         </motion.div>
       </motion.div>
+
+      {/* Thank You Modal */}
+      {showThankYou && (
+        <motion.div
+          className="fixed inset-0 z-50 bg-black/50 overflow-y-auto"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <motion.div
+              className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+            >
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="text-center">
+                  <motion.div
+                    className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4"
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </motion.div>
+                  <h3 className="text-lg leading-6 font-medium text-gray-900 mb-2">
+                    Thank You!
+                  </h3>
+                  <div className="text-sm text-gray-600 space-y-3">
+                    <p>Your message has been successfully submitted. We&apos;ll get back to you within 24 hours.</p>
+                    
+                    <div className="border-t pt-3 mt-4">
+                      <p className="font-medium text-gray-700 mb-2">Need immediate support?</p>
+                      <div className="space-y-1">
+                        <p>Email: <a href="mailto:jaglan.nakul@gmail.com" className="text-blue-600 hover:underline"> jaglan.nakul@gmail.com</a></p>
+                        <p>Phone: <a href="tel:+917988223181" className="text-blue-600 hover:underline"> +91 7988223181</a></p>
+                      </div>
+                    </div>
+                    
+                    <p className="text-xs text-gray-500 mt-4">
+                      Redirecting to home page in 10 seconds...
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setShowThankYou(false)
+                    window.location.href = '/'
+                  }}
+                  className="w-full cursor-pointer inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Go to Home
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowThankYou(false)}
+                  className="mt-3 w-full cursor-pointer inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto sm:text-sm"
+                >
+                  Close
+                </motion.button>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+      )}
     </Layout>
   )
 }

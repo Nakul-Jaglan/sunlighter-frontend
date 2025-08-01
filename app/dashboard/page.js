@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from '../../contexts/AuthContext'
 import { employment, verification } from '../../services/api'
@@ -62,13 +62,7 @@ function EmployeeDashboard() {
   }
 
   // Data loading effect
-  useEffect(() => {
-    if (!authLoading && isAuthenticated) {
-      loadDashboardData()
-    }
-  }, [authLoading, isAuthenticated])
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setIsLoading(true)
       setError(null)
@@ -101,7 +95,13 @@ function EmployeeDashboard() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      loadDashboardData()
+    }
+  }, [authLoading, isAuthenticated, loadDashboardData])
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -468,6 +468,34 @@ function EmployeeDashboard() {
                       </div>
                     </motion.div>
                   )}
+                </Card>
+              </motion.div>
+
+              {/* User Profile Information */}
+              <motion.div variants={itemVariants}>
+                <Card className="p-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Profile Information</h2>
+                  
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                      <p className="text-gray-900">{user?.full_name}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+                      <p className="text-gray-900 font-mono bg-gray-50 px-2 py-1 rounded">
+                        {user?.user_id || 'Not assigned'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                      <p className="text-gray-900">{user?.email}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Account Type</label>
+                      <p className="text-gray-900 capitalize">{user?.user_type}</p>
+                    </div>
+                  </div>
                 </Card>
               </motion.div>
 

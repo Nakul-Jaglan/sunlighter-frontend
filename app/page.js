@@ -321,7 +321,7 @@ function HomePage() {
         </motion.section>
 
         {/* Testimonials */}
-        <motion.section className="py-20" variants={itemVariants}>
+        {/* <motion.section className="py-20" variants={itemVariants}>
           <div className="text-center mb-6">
             <motion.h2 
               className="text-4xl font-bold text-gray-900 mb-4"
@@ -365,7 +365,7 @@ function HomePage() {
               ))}
             </div>
           </div>
-        </motion.section>
+        </motion.section> */}
 
         {/* CTA Section */}
         <motion.section 

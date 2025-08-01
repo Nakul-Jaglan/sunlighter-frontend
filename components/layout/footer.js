@@ -58,7 +58,8 @@ const Footer = () => {
 
   const quickLinks = [
     { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard" },
+    // { name: "Dashboard", href: "/dashboard" },
+    { name: "Future", href: "/future" },
     { name: "Pricing", href: "/pricing" },
     { name: "Contact", href: "/contact" }
   ]
@@ -90,7 +91,7 @@ const Footer = () => {
               className="flex items-center space-x-3 mb-4"
             >
               <Link href="/" className="flex items-center space-x-3" aria-label="Home">
-                <div className="relative w-8 h-8 sm:w-30 sm:h-10 md:w-50 md:h-20">
+                <div className="relative w-50 h-20">
                   <Image
                     src="/letter.png"
                     alt="Company Logo"
