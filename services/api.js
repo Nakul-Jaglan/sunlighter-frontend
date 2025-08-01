@@ -1,6 +1,12 @@
 // API service for SunLighter backend
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
+// Debug logging to see what's happening
+if (typeof window !== 'undefined') {
+  console.log('Environment API URL:', process.env.NEXT_PUBLIC_API_URL)
+  console.log('Final API_BASE_URL:', API_BASE_URL)
+}
+
 class ApiService {
   constructor() {
     this.baseURL = API_BASE_URL
@@ -32,7 +38,12 @@ class ApiService {
 
   // Generic API request method
   async request(endpoint, options = {}) {
+    if (!this.baseURL) {
+      throw new Error('API_BASE_URL is not configured. Please set NEXT_PUBLIC_API_URL environment variable.')
+    }
+    
     const url = `${this.baseURL}${endpoint}`
+    console.log('Making request to:', url) // Debug log
     const isFormData = options.body instanceof FormData
     const config = {
       headers: this.getHeaders(isFormData),
