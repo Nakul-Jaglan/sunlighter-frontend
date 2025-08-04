@@ -1,10 +1,11 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { motion, useScroll, useTransform } from "framer-motion"
 import Layout from '../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
+import { FaUserShield, FaBolt, FaShieldAlt, FaGlobe, FaChartBar, FaHandshake, FaUser, FaSearch, FaClipboard } from "react-icons/fa"
+
 
 function HomePage() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
@@ -38,32 +39,32 @@ function HomePage() {
 
   const features = [
     {
-      icon: "🔐",
+      icon: <FaShieldAlt className="w-8 h-8 text-green-500" />,
       title: "Privacy-First Verification",
       description: "Employees control their data with time-limited access codes and approval systems."
     },
     {
-      icon: "⚡",
+      icon: <FaBolt className="w-8 h-8 text-yellow-400" />,
       title: "Instant Verification",
       description: "Get employment status verification in seconds, not days or weeks."
     },
     {
-      icon: "🛡️",
+      icon: <FaUserShield className="w-8 h-8 text-red-600" />,
       title: "Secure & Compliant",
-      description: "Enterprise-grade security with full GDPR and SOC 2 compliance."
+      description: "Upcoming Enterprise-grade security with full GDPR and SOC 2 compliance."
     },
     {
-      icon: "🌐",
+      icon: <FaGlobe className="w-8 h-8 text-blue-500" />,
       title: "Easy Integration",
       description: "Simple API integration with your existing HR systems and workflows."
     },
     {
-      icon: "📊",
+      icon: <FaChartBar className="w-8 h-8 text-orange-500" />,
       title: "Complete Audit Trail",
       description: "Full transparency with detailed logs and compliance reports."
     },
     {
-      icon: "🤝",
+      icon: <FaHandshake className="w-8 h-8 text-yellow-500" />,
       title: "Win-Win Solution",
       description: "Benefits both employers and employees with mutual trust and transparency."
     }
@@ -255,7 +256,7 @@ function HomePage() {
         </motion.section>
 
         {/* How It Works */}
-        <motion.section className="py-20 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl" variants={itemVariants}>
+        <motion.section className="py-10 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl" variants={itemVariants}>
           <div className="text-center mb-16">
             <motion.h2 
               className="text-4xl font-bold text-gray-900 mb-4"
@@ -282,19 +283,19 @@ function HomePage() {
                 step: "01",
                 title: "Employee Creates Code",
                 description: "Employees generate time-limited verification codes with full control over access and duration.",
-                icon: "👤"
+                icon: <FaUser className="w-8 h-8 text-green-600" />
               },
               {
                 step: "02", 
                 title: "Employer Verifies",
                 description: "Employers enter the code to instantly access verified employment information securely.",
-                icon: "🔍"
+                icon: <FaSearch className="w-8 h-8 text-green-600" />
               },
               {
                 step: "03",
                 title: "Complete Transparency",
                 description: "Both parties get full audit trails and notifications for complete transparency and trust.",
-                icon: "📋"
+                icon: <FaClipboard className="w-8 h-8 text-green-700" />
               }
             ].map((step, index) => (
               <motion.div
@@ -369,7 +370,7 @@ function HomePage() {
 
         {/* CTA Section */}
         <motion.section 
-          className="py-10 mt-20 bg-gradient-to-r from-sky-500 to-blue-700 rounded-2xl text-white text-center"
+          className="py-10 mt-40 bg-gradient-to-r from-sky-500 to-blue-700 rounded-2xl text-white text-center"
           variants={itemVariants}
           style={{ y: y2 }}
         >

@@ -6,6 +6,9 @@ import Layout from '../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
+import { FaWhatsapp, FaPhone, FaPaperPlane } from 'react-icons/fa'
+import { MdOutlineMailLock } from "react-icons/md";
+
 
 function ContactPage() {
   const [formData, setFormData] = useState({
@@ -144,21 +147,21 @@ function ContactPage() {
 
   const contactMethods = [
     {
-      icon: '📧',
+      icon: <MdOutlineMailLock className="text-gray-600" />,
       title: 'Email Us',
       description: 'Get in touch via email',
       contact: 'jaglan.nakul@gmail.com',
       action: 'mailto:jaglan.nakul@gmail.com'
     },
-    // {
-    //   icon: '💬',
-    //   title: 'Live Chat',
-    //   description: 'Chat with our support team',
-    //   contact: 'Available 24*7',
-    //   action: '#'
-    // },
     {
-      icon: '📞',
+      icon: <FaWhatsapp className="text-gray-600" />,
+      title: 'Live Chat',
+      description: 'Chat directly on WhatsApp',
+      contact: 'Available 24*7',
+      action: 'https://wa.me/917988223181?text=Hello%20SunLighter%20Team'
+    },
+    {
+      icon: <FaPhone className="text-gray-600" />,
       title: 'Phone Support',
       description: 'Get in touch via phone',
       contact: '+91 7988223181',
@@ -306,8 +309,9 @@ function ContactPage() {
                       <Button
                         type="submit"
                         disabled={isSubmitting || !formData.name || !formData.email || !formData.subject || !formData.message}
-                        className="w-full py-3 text-lg"
+                        className="w-full py-3 text-lg flex items-center justify-center"
                       >
+                        <FaPaperPlane className="mr-2" />
                         {isSubmitting ? (
                           <div className="flex items-center justify-center">
                             <motion.div
@@ -318,7 +322,7 @@ function ContactPage() {
                             Sending Message...
                           </div>
                         ) : (
-                          '📤 Send Message'
+                          'Send Message'
                         )}
                       </Button>
                     </motion.div>
@@ -339,6 +343,7 @@ function ContactPage() {
                     <motion.a
                       key={index}
                       href={method.action}
+                      target="_blank"
                       className="block p-4 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-colors group"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}

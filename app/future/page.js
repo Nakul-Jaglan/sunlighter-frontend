@@ -5,6 +5,7 @@ import Layout from '../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Link from "next/link"
+import { FaStar, FaLock, FaRocket } from 'react-icons/fa'
 
 function FuturePlansPage() {
   const containerVariants = {
@@ -279,18 +280,18 @@ function FuturePlansPage() {
               className="grid md:grid-cols-3 gap-8 mb-12"
               variants={itemVariants}
             >
-              <div className="text-center">
-                <div className="text-4xl mb-4">🌟</div>
+              <div className="text-center flex flex-col items-center">
+                <div className="text-4xl mb-4"><FaStar className="text-yellow-400" /></div>
                 <h3 className="text-xl font-semibold mb-2">Industry Standard</h3>
                 <p className="text-blue-100">The go-to solution for employment verification worldwide</p>
               </div>
-              <div className="text-center">
-                <div className="text-4xl mb-4">🔒</div>
+              <div className="text-center flex flex-col items-center">
+                <div className="text-4xl mb-4"><FaLock className="text-red-600" /></div>
                 <h3 className="text-xl font-semibold mb-2">Privacy Leader</h3>
                 <p className="text-blue-100">Setting new standards for data protection and user control</p>
               </div>
-              <div className="text-center">
-                <div className="text-4xl mb-4">🚀</div>
+              <div className="text-center flex flex-col items-center">
+                <div className="text-4xl mb-4"><FaRocket className="text-green-600" /></div>
                 <h3 className="text-xl font-semibold mb-2">Innovation Hub</h3>
                 <p className="text-blue-100">Continuously pushing the boundaries of verification technology</p>
               </div>

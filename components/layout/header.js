@@ -168,7 +168,7 @@ const Header = () => {
             className="flex items-center"
           >
             <Link href="/" className="flex items-center space-x-3" aria-label="Home">
-              <div className="relative w-50 h-50">
+              <div className="relative w-50 h-20">
                 <Image
                   src="/letter.png"
                   alt="Company Logo"

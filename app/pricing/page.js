@@ -4,6 +4,9 @@ import { motion } from "framer-motion"
 import Layout from '../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
+import { FaUser, FaPeopleArrows, FaBuilding, FaStar } from 'react-icons/fa'
+import { FaRoadBarrier } from "react-icons/fa6";
+
 
 function PricingPage() {
   const containerVariants = {
@@ -163,26 +166,28 @@ function PricingPage() {
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full transform -translate-x-4 translate-y-4"></div>
               
               <div className="relative z-10">
-                <div className="text-4xl mb-4">🚧</div>
-                <h2 className="text-3xl font-bold mb-4">Future Pricing Plans</h2>
-                <p className="text-xl opacity-90 mb-6">
-                  We&apos;re crafting flexible plans for individuals, teams, and enterprises. 
-                  Stay tuned for announcements!
-                </p>
+                <div className="flex flex-col items-center ">
+                  <div className="text-5xl mb-4"><FaRoadBarrier className="text-yellow-400" /></div>
+                  <h2 className="text-3xl font-bold mb-4">Future Pricing Plans</h2>
+                  <p className="text-xl opacity-90 mb-6">
+                    We&apos;re crafting flexible plans for individuals, teams, and enterprises. 
+                    Stay tuned for announcements!
+                  </p>
+                </div>
                 
                 <div className="grid md:grid-cols-3 gap-6 mb-8">
-                  <div className="bg-white text-gray-700 bg-opacity-10 rounded-lg p-4">
-                    <div className="text-2xl mb-2">👤</div>
+                  <div className="bg-white text-gray-700 bg-opacity-10 rounded-lg p-4 flex flex-col items-center">
+                    <div className="text-2xl mb-2"><FaUser className="w-8 h-8 text-blue-600" /></div>
                     <h3 className="font-semibold mb-1">Individual</h3>
                     <p className="text-sm opacity-80">Perfect for freelancers</p>
                   </div>
-                  <div className="bg-white text-gray-700 bg-opacity-10 rounded-lg p-4">
-                    <div className="text-2xl mb-2">👥</div>
+                  <div className="bg-white text-gray-700 bg-opacity-10 rounded-lg p-4 flex flex-col items-center">
+                    <div className="text-2xl mb-2"><FaPeopleArrows className="w-8 h-8 text-blue-600" /></div>
                     <h3 className="font-semibold mb-1">Team</h3>
                     <p className="text-sm opacity-80">For growing companies</p>
                   </div>
-                  <div className="bg-white text-gray-700 bg-opacity-10 rounded-lg p-4">
-                    <div className="text-2xl mb-2">🏢</div>
+                  <div className="bg-white text-gray-700 bg-opacity-10 rounded-lg p-4 flex flex-col items-center">
+                    <div className="text-2xl mb-2"><FaBuilding className="w-8 h-8 text-blue-600" /></div>
                     <h3 className="font-semibold mb-1">Enterprise</h3>
                     <p className="text-sm opacity-80">Custom solutions</p>
                   </div>
@@ -205,14 +210,16 @@ function PricingPage() {
             transition={{ duration: 0.6 }}
           >
             <Card className="p-8 bg-gray-50 border-2 border-gray-200">
-              <div className="text-4xl mb-4">⭐</div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Want early access to premium features?
-              </h2>
-              <p className="text-lg text-gray-600 mb-6">
-                Join our early access program and help shape the future of SunLighter. 
-                Get priority access to new features and special pricing.
-              </p>
+              <div className="flex flex-col items-center">
+                <div className="text-5xl mb-4"><FaStar className="text-yellow-400" /></div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Want early access to premium features?
+                </h2>
+                <p className="text-lg text-gray-600 mb-6">
+                  Join our early access program and help shape the future of SunLighter. 
+                  Get priority access to new features and special pricing.
+                </p>
+              </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
