@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useReducer, useEffect } from 'react'
 import apiService, { auth } from '../services/api'
+import { toast } from 'sonner'
 
 // Initial state
 const initialState = {
@@ -104,7 +105,7 @@ export const AuthProvider = ({ children }) => {
       dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR })
       
       const response = await auth.login(email, password)
-      
+      toast.success("Logged in Successfully");
       // Get user data after successful login
       const user = await auth.getCurrentUser()
       dispatch({ type: AUTH_ACTIONS.SET_USER, payload: user })
@@ -112,7 +113,7 @@ export const AuthProvider = ({ children }) => {
       return { success: true, user }
     } catch (error) {
       console.error('Login failed:', error)
-      
+      toast.error(error.message);
       // Extract readable error message  
       let errorMessage = 'Login failed. Please check your credentials.'
       

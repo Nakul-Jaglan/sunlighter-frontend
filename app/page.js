@@ -189,7 +189,7 @@ function HomePage() {
         </motion.section>
 
         {/* Stats Section */}
-        <motion.section className="py-10 bg-gray-50 rounded-2xl" variants={itemVariants}>
+        <motion.section className="py-30 bg-gray-50 rounded-2xl" variants={itemVariants}>
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Trusted by Industry Leaders</h2>
             <p className="text-gray-600">Join thousands of companies and employees who trust SunLighter</p>

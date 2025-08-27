@@ -150,7 +150,7 @@ const Header = () => {
       role="banner"
     >
       <motion.nav 
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" 
+        className="max-w-7xl mx-auto pl-2 pr-4 sm:pr-6 lg:pr-8" 
         role="navigation" 
         aria-label="Main navigation"
         variants={navContainerVariants}
@@ -184,7 +184,7 @@ const Header = () => {
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8" role="menubar">
+          <div className="hidden lg:flex items-center space-x-8 pr-16" role="menubar">
             {navItems.map((item, index) => (
               <motion.div
                 key={item.name}
@@ -291,12 +291,14 @@ const Header = () => {
                   whileTap={{ scale: 0.98 }}
                   transition={{ duration: 0.1 }}
                 >
+                  <Button className="bg-green-600 px-2 py-2">
                   <Link
                     href="/login"
-                    className="text-gray-600 text-xl hover:text-gray-900 font-medium transition-colors duration-200"
+                    className="text-gray-100 text-xl hover:text-gray-900 font-medium transition-colors duration-200"
                   >
                     Log In
                   </Link>
+                  </Button>
                 </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.02 }}

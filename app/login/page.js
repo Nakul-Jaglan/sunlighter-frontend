@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from '../../contexts/AuthContext'
 import Layout from '../../components/layout/Layout'
@@ -9,7 +9,7 @@ import Button from '@/components/Button'
 import Input from '@/components/Input'
 
 function LoginPage() {
-  const { login, isLoading, error, clearError } = useAuth()
+  const { login, isLoading, error, clearError, user } = useAuth()
   const [userType, setUserType] = useState(null) // 'employee' or 'employer'
   const [formData, setFormData] = useState({
     email: "",
@@ -29,6 +29,14 @@ function LoginPage() {
     }
   }
 
+  useEffect(()=>{
+    if (user) {
+      console.log("User logged in:", user);
+      const redirectPath = user.user_type === 'employer' ? '/employer/dashboard' : '/dashboard'
+      window.location.href = redirectPath
+    }
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitted(true)
@@ -40,9 +48,11 @@ function LoginPage() {
         // Redirect based on user role
         const redirectPath = result.user.user_type === 'employer' ? '/employer/dashboard' : '/dashboard'
         window.location.href = redirectPath
+        
       }
     } catch (error) {
       console.error('Login error:', error)
+      console.log(result)
     } finally {
       setIsSubmitted(false)
     }
