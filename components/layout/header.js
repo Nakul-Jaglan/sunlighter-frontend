@@ -262,7 +262,7 @@ const Header = () => {
                           Dashboard
                         </Link>
                         <Link
-                          href="/profile"
+                          href={user.user_type === 'employer' ? '/employer/profile' : '/profile'}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                           onClick={() => setShowUserDropdown(false)}
                         >
@@ -391,6 +391,11 @@ const Header = () => {
                     <Button variant="primary" className="w-full px-4 py-2">
                       <Link href={getDashboardLink()} className="text-white">
                         Dashboard
+                      </Link>
+                    </Button>
+                    <Button variant="secondary" className="w-full px-4 py-2">
+                      <Link href={user.user_type === 'employer' ? '/employer/profile' : '/profile'} className="text-gray-700">
+                        Profile
                       </Link>
                     </Button>
                     <button

@@ -174,6 +174,32 @@ export const AuthProvider = ({ children }) => {
     dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR })
   }
 
+  const updateProfile = async (userData) => {
+    try {
+      dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: true })
+      dispatch({ type: AUTH_ACTIONS.CLEAR_ERROR })
+      
+      const updatedUser = await auth.updateProfile(userData)
+      dispatch({ type: AUTH_ACTIONS.SET_USER, payload: updatedUser })
+      
+      return true
+    } catch (error) {
+      console.error('Profile update failed:', error)
+      
+      let errorMessage = 'Profile update failed. Please try again.'
+      if (error.message) {
+        errorMessage = error.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      }
+      
+      dispatch({ type: AUTH_ACTIONS.SET_ERROR, payload: errorMessage })
+      return false
+    } finally {
+      dispatch({ type: AUTH_ACTIONS.SET_LOADING, payload: false })
+    }
+  }
+
   const value = {
     // State
     user: state.user,
@@ -186,7 +212,8 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     clearError,
-    checkAuthStatus
+    checkAuthStatus,
+    updateProfile
   }
 
   return (
