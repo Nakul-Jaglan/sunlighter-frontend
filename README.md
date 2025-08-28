@@ -68,7 +68,7 @@ SunLighter is a modern platform for secure, privacy-focused employment verificat
 |-----------------------|------------------------------------|
 | NEXT_PUBLIC_API_URL   | Backend API base URL (required)    |
 
-**Never commit secrets or production credentials to the repo.**
+**Never commit secrets to the repo.**
 
 ---
 
