@@ -7,7 +7,7 @@
 
 > **Privacy-first employment verification platform**
 >
-> Live: [https://sunlighter.nakul.click](https://sunlighter.nakul.click)
+> Live: [https://sunlighter.in](https://sunlighter.in)
 
 ---
 
