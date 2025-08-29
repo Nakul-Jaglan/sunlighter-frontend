@@ -1020,7 +1020,7 @@ function EmployeeDashboard() {
                           }}
                         />
                         <p className="text-xs text-gray-500 mt-1">
-                          Enter the company's handle (without @). Verification requests will be sent directly to this company account.
+                          Enter the company&apos;s handle (without @). Verification requests will be sent directly to this company account.
                         </p>
                       </div>
                       
