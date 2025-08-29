@@ -94,7 +94,7 @@ export default function EmploymentVerificationRequests() {
       const requestData = {
         employment_id: parseInt(selectedEmployment),
         company_name: selectedEmploymentData.company_name,
-        company_website: selectedEmploymentData.company_website || '',
+        company_website: selectedEmploymentData.company_website || `https://${selectedEmploymentData.company_handle}.com`,
         verification_message: verificationMessage
       }
 
