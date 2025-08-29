@@ -17,7 +17,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata = {
   title: {
-    default: "SunLighter - Privacy-First Instant Employment Verification Platform",
+    default: "SunLighter - Privacy-First Instant Employment Verification",
     template: "%s | SunLighter"
   },
   description: "Privacy-first instant employment verification platform. Verify employment history with blockchain technology, employee consent, & complete data privacy control.",
@@ -48,8 +48,8 @@ export const metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://sunlighter.in',
-    title: 'SunLighter - Privacy-First Employment Verification Platform',
+    url: 'https://www.sunlighter.in',
+    title: 'SunLighter - Privacy-First Instant Employment Verification',
     description: 'Privacy-first instant employment verification platform. Verify employment history with blockchain technology, employee consent, & complete data privacy control.',
     siteName: 'SunLighter',
     images: [
@@ -57,13 +57,13 @@ export const metadata = {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'SunLighter - Privacy-First Employment Verification Platform',
+        alt: 'SunLighter - Privacy-First Instant Employment Verification',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SunLighter - Privacy-First Employment Verification Platform',
+    title: 'SunLighter - Privacy-First Instant Employment Verification',
     description: 'Privacy-first instant employment verification platform. Verify employment history with blockchain technology, employee consent, & complete data privacy control.',
     images: ['/og-image.jpg'],
     creator: '@sunlighter',
