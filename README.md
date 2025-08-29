@@ -76,7 +76,7 @@ SunLighter is a modern platform for secure, privacy-focused employment verificat
 
 - Deploys instantly on [Vercel](https://vercel.com/)
 - Set `NEXT_PUBLIC_API_URL` in Vercel project settings
-- [Live Demo](https://sunlighter.nakul.click)
+- [Live Demo](https://sunlighter.in)
 
 ---
 

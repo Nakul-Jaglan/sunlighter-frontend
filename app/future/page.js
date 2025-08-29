@@ -52,7 +52,7 @@ function FuturePlansPage() {
     {
       id: 2,
       title: "Government ID Verification",
-      subtitle: "(opt-in)",
+      // subtitle: "(opt-in)",
       icon: "🆔",
       gradient: "from-blue-500 to-cyan-600",
       features: [
@@ -201,7 +201,7 @@ function FuturePlansPage() {
                 >
                   <Card className="p-8 h-full relative overflow-hidden">
                     {/* Background Gradient */}
-                    <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${feature.gradient}`} />
+                    {/* <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${feature.gradient}`} /> */}
                     
                     {/* Timeline Badge */}
                     {/* <div className="absolute top-4 right-4">
@@ -307,7 +307,7 @@ function FuturePlansPage() {
           <div className="max-w-4xl mx-auto">
             <motion.div
               variants={itemVariants}
-              className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-12"
+              className="rounded-3xl p-12"
             >
               <motion.h2 
                 className="text-4xl font-bold text-gray-900 mb-6"

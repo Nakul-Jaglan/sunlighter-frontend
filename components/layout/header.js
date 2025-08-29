@@ -291,10 +291,10 @@ const Header = () => {
                   whileTap={{ scale: 0.98 }}
                   transition={{ duration: 0.1 }}
                 >
-                  <Button className="bg-green-600 px-2 py-2">
+                  <Button className="bg-green-600 hover:bg-green-700 px-2 py-2">
                   <Link
                     href="/login"
-                    className="text-gray-100 text-xl hover:text-gray-900 font-medium transition-colors duration-200"
+                    className="text-gray-100 text-xl font-medium transition-colors duration-200"
                   >
                     Log In
                   </Link>
