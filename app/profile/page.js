@@ -124,7 +124,7 @@ function ProfilePage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
             <p className="text-gray-600 mb-6">Please log in to view your profile.</p>
             <Button variant="primary">
-              <a href="/login" className="text-white">Log In</a>
+              <a href="/login" className="text-white py-2">Log In</a>
             </Button>
           </Card>
         </div>
@@ -135,7 +135,7 @@ function ProfilePage() {
   return (
     <Layout title="Profile - SunLighter">
       <motion.div 
-        className="max-w-4xl mx-auto"
+        className="max-w-5xl mx-auto"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -151,7 +151,7 @@ function ProfilePage() {
           {/* Profile Header */}
           <motion.div variants={cardVariants}>
             <Card className="p-6">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-white text-2xl font-bold">
@@ -160,19 +160,19 @@ function ProfilePage() {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">{user.full_name}</h2>
-                    <div className="flex items-center space-x-4 mt-1">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    <div className="flex items-center space-x-2 mt-1">
+                      {/* <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                         user.user_type === 'employer' 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-blue-100 text-blue-800'
                       }`}>
                         {user.user_type === 'employer' ? 'Employer' : 'Employee'}
-                      </span>
+                      </span> */}
                       {user.user_type === 'employer' && user.company_handle && (
                         <span className="text-sm text-green-600 font-medium">@{user.company_handle}</span>
                       )}
                       {user.user_type === 'employee' && user.user_id && (
-                        <span className="text-sm text-blue-600 font-medium">#{user.user_id}</span>
+                        <span className="text-sm text-green-600 font-medium">#{user.user_id}</span>
                       )}
                     </div>
                   </div>

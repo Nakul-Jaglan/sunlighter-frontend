@@ -374,6 +374,7 @@ export const auth = {
   login: (email, password) => apiService.login(email, password),
   logout: () => apiService.logout(),
   getCurrentUser: () => apiService.getCurrentUser(),
+  updateProfile: (userData) => apiService.updateProfile(userData)
 }
 
 export const employment = {

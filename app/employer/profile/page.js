@@ -121,7 +121,7 @@ function EmployerProfilePage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
             <p className="text-gray-600 mb-6">This page is only accessible to employers.</p>
             <Button variant="primary">
-              <a href="/login" className="text-white">Log In</a>
+              <a href="/login" className="text-white py-2">Log In</a>
             </Button>
           </Card>
         </div>
