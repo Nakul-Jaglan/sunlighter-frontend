@@ -636,7 +636,7 @@ function HomePage() {
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <h4 className="font-semibold text-blue-900 mb-2">Custom Integration Support</h4>
                 <p className="text-blue-700 text-sm">
-                  Don't see your system listed? Our integration team will help you build custom connections 
+                  Don&apos;t see your system listed? Our integration team will help you build custom connections 
                   to your existing tools and workflows.
                 </p>
               </div>
