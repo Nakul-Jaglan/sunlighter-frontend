@@ -20,7 +20,7 @@ export const metadata = {
     default: "SunLighter - Privacy-First Instant Employment Verification Platform",
     template: "%s | SunLighter"
   },
-  description: "Secure, privacy-first employment verification platform. Verify employment history with blockchain technology, employee consent, and complete data privacy control.",
+  description: "Privacy-first instant employment verification platform. Verify employment history with blockchain technology, employee consent, & complete data privacy control.",
   keywords: [
     "employment verification",
     "privacy-first",
@@ -43,14 +43,14 @@ export const metadata = {
   },
   metadataBase: new URL('https://sunlighter.in'),
   alternates: {
-    canonical: '/',
+    canonical: 'https://sunlighter.in',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://sunlighter.in',
     title: 'SunLighter - Privacy-First Employment Verification Platform',
-    description: 'Secure, privacy-first employment verification platform. Verify employment history with blockchain technology, employee consent, and complete data privacy control.',
+    description: 'Privacy-first instant employment verification platform. Verify employment history with blockchain technology, employee consent, & complete data privacy control.',
     siteName: 'SunLighter',
     images: [
       {
@@ -64,7 +64,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SunLighter - Privacy-First Employment Verification Platform',
-    description: 'Secure, privacy-first employment verification platform. Verify employment history with blockchain technology, employee consent, and complete data privacy control.',
+    description: 'Privacy-first instant employment verification platform. Verify employment history with blockchain technology, employee consent, & complete data privacy control.',
     images: ['/og-image.jpg'],
     creator: '@sunlighter',
   },
@@ -136,7 +136,6 @@ export default function RootLayout({ children }) {
         <meta name="application-name" content="SunLighter" />
         <meta name="msapplication-TileColor" content="#3B82F6" />
         <meta name="theme-color" content="#3B82F6" />
-        <link rel="canonical" href="https://sunlighter.in" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
