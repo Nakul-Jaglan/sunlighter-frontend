@@ -41,9 +41,9 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://sunlighter.in'),
+  metadataBase: new URL('https://www.sunlighter.in'),
   alternates: {
-    canonical: 'https://sunlighter.in',
+    canonical: 'https://www.sunlighter.in',
   },
   openGraph: {
     type: 'website',
@@ -144,7 +144,7 @@ export default function RootLayout({ children }) {
               "@type": "SoftwareApplication",
               "name": "SunLighter",
               "description": "Privacy-first employment verification platform",
-              "url": "https://sunlighter.in",
+              "url": "https://www.sunlighter.in",
               "applicationCategory": "BusinessApplication",
               "operatingSystem": "Web Browser",
               "offers": {
