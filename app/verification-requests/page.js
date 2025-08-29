@@ -1,5 +1,5 @@
 'use client'
-import Layout from '@/components/Layout'
+import Layout from '@/components/layout/Layout'
 import EmploymentVerificationRequests from '@/components/EmploymentVerificationRequests'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'

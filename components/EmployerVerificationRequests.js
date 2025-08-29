@@ -1,12 +1,12 @@
 "use client"
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import Card from './Card'
+import Button from './Button'
+import Textarea from './ui/textarea'
+import Badge from './ui/badge'
+import { Alert, AlertDescription } from './ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { employmentVerification } from '@/services/api'
 import { 
   CheckCircle, 
