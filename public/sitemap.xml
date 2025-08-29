@@ -57,6 +57,21 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Verification Pages -->
+  <url>
+    <loc>https://sunlighter.in/verification-requests</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://sunlighter.in/employer/verification-requests</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Future Features -->
   <url>
     <loc>https://sunlighter.in/future</loc>

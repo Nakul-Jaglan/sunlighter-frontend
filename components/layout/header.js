@@ -268,6 +268,24 @@ const Header = () => {
                         >
                           Profile
                         </Link>
+                        {user.user_type === 'employee' && (
+                          <Link
+                            href="/verification-requests"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            Verification Requests
+                          </Link>
+                        )}
+                        {user.user_type === 'employer' && (
+                          <Link
+                            href="/employer/verification-requests"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            onClick={() => setShowUserDropdown(false)}
+                          >
+                            Verify Employees
+                          </Link>
+                        )}
                         <div className="border-t border-gray-100"></div>
                         <button
                           onClick={() => {
@@ -400,6 +418,20 @@ const Header = () => {
                         Profile
                       </Link>
                     </Button>
+                    {user.user_type === 'employee' && (
+                      <Button variant="secondary" className="w-full px-4 py-2">
+                        <Link href="/verification-requests" className="text-gray-700">
+                          Verification Requests
+                        </Link>
+                      </Button>
+                    )}
+                    {user.user_type === 'employer' && (
+                      <Button variant="secondary" className="w-full px-4 py-2">
+                        <Link href="/employer/verification-requests" className="text-gray-700">
+                          Verify Employees
+                        </Link>
+                      </Button>
+                    )}
                     <button
                       onClick={() => {
                         logout()

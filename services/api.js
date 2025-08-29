@@ -297,6 +297,34 @@ class ApiService {
     return await this.request('/access-logs/')
   }
 
+  // Employment Verification Request APIs
+  async createEmploymentVerificationRequest(requestData) {
+    return await this.request('/employment-verification-requests/', {
+      method: 'POST',
+      body: JSON.stringify(requestData)
+    })
+  }
+
+  async getMyVerificationRequests(skip = 0, limit = 100) {
+    return await this.request(`/employment-verification-requests/my-requests?skip=${skip}&limit=${limit}`)
+  }
+
+  async getPendingVerificationRequests(skip = 0, limit = 100, status = null) {
+    const statusParam = status ? `&status=${status}` : ''
+    return await this.request(`/employment-verification-requests/pending?skip=${skip}&limit=${limit}${statusParam}`)
+  }
+
+  async updateVerificationRequestStatus(requestId, statusData) {
+    return await this.request(`/employment-verification-requests/${requestId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify(statusData)
+    })
+  }
+
+  async getVerificationStats() {
+    return await this.request('/employment-verification-requests/stats')
+  }
+
   // Admin APIs (for employers)
   async searchUsers(query) {
     return await this.request(`/admin/users/search?q=${encodeURIComponent(query)}`)
@@ -365,6 +393,14 @@ export const verification = {
   getAccessLogs: () => apiService.getAccessLogs(),
 }
 
+export const employmentVerification = {
+  createRequest: (data) => apiService.createEmploymentVerificationRequest(data),
+  getMyRequests: (skip, limit) => apiService.getMyVerificationRequests(skip, limit),
+  getPendingRequests: (skip, limit, status) => apiService.getPendingVerificationRequests(skip, limit, status),
+  updateRequestStatus: (id, data) => apiService.updateVerificationRequestStatus(id, data),
+  getStats: () => apiService.getVerificationStats(),
+}
+
 export const admin = {
   searchUsers: (query) => apiService.searchUsers(query),
   getAllAccessLogs: () => apiService.getAllAccessLogs(),
@@ -383,6 +419,7 @@ export const api = {
   auth,
   employment,
   verification,
+  employmentVerification,
   admin,
   employer,
 }
