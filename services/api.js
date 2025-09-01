@@ -184,7 +184,7 @@ class ApiService {
 
   // Authentication APIs
   async register(userData) {
-    const response = await this.request('/auth/register', {
+    const response = await this.request('/auth/employee/register', {
       method: 'POST',
       body: JSON.stringify(userData)
     })
@@ -226,7 +226,7 @@ class ApiService {
 
   // User APIs
   async getCurrentUser() {
-    return await this.request('/users/me')
+    return await this.request('/employees/me')
   }
 
   async updateProfile(userData) {
