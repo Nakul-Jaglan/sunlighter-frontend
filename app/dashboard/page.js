@@ -38,7 +38,7 @@ function EmployeeDashboard() {
     company: "",
     role: "",
     joiningDate: "",
-    location: "",
+    companyHandle: "",  // Changed from location to companyHandle
     employmentType: "Full-time",
     department: "",
     salary: ""
@@ -81,7 +81,7 @@ function EmployeeDashboard() {
         company: emp.company_name,
         role: emp.job_title,  // Changed from 'position' to 'job_title'
         joiningDate: emp.start_date,
-        location: emp.company_location,  // Changed to 'company_location'
+        companyHandle: emp.company_handle,  // Changed from location to company_handle
         endDate: emp.end_date,
         isCurrent: emp.employment_status === 'current'  // Check employment_status instead of is_current
       }))
@@ -98,8 +98,13 @@ function EmployeeDashboard() {
   }, [])
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated) {
+    if(authLoading) return
+    if (isAuthenticated) {
       loadDashboardData()
+    }
+    else{
+      window.location.href = '/login';
+      return
     }
   }, [authLoading, isAuthenticated, loadDashboardData])
 
@@ -218,10 +223,11 @@ function EmployeeDashboard() {
         company_name: newEmploymentForm.company,
         job_title: newEmploymentForm.role,  // Changed from 'position' to 'job_title'
         start_date: newEmploymentForm.joiningDate,
-        company_location: newEmploymentForm.location,  // Changed from 'location' to 'company_location'
+        company_website: `https://${newEmploymentForm.companyHandle}.com`,  // Generate website from handle
         employment_type: employmentTypeToBackend[newEmploymentForm.employmentType],
         department: newEmploymentForm.department,
         salary_range: newEmploymentForm.salary || null,  // Changed from 'salary' to 'salary_range'
+        company_handle: newEmploymentForm.companyHandle,  // Store company handle for direct matching
       }
       
       const newEmployment = await employment.create(employmentData)
@@ -233,7 +239,7 @@ function EmployeeDashboard() {
         company: newEmployment.company_name,
         role: newEmployment.job_title,  // Changed from 'position' to 'job_title'
         joiningDate: newEmployment.start_date,
-        location: newEmployment.company_location,  // Changed to 'company_location'
+        companyHandle: newEmployment.company_handle || newEmploymentForm.companyHandle,  // Use company handle
         endDate: newEmployment.end_date,
         isCurrent: newEmployment.employment_status === 'current'  // Check employment_status
       }
@@ -253,7 +259,7 @@ function EmployeeDashboard() {
         company: "",
         role: "",
         joiningDate: "",
-        location: "",
+        companyHandle: "",  // Changed from location
         employmentType: "Full-time",
         department: "",
         salary: ""
@@ -386,30 +392,31 @@ function EmployeeDashboard() {
         </motion.div>
 
         {/* Navigation Tabs */}
-        <motion.div className="mb-8" variants={itemVariants}>
+        <motion.div className="mb-8 flex overflow-x-auto justify-center" variants={itemVariants}>
           <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8 overflow-x-auto">
+            <nav className="-mb-px flex">
               {tabs.map((tab) => (
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`whitespace-nowrap cursor-pointer py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
+                  className={`w-32 flex-shrink-0 cursor-pointer py-4 px-1 border-b-2 font-medium text-sm flex items-center justify-center transition-colors duration-200
+                    ${
+                      activeTab === tab.id
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
                   variants={tabVariants}
                   animate={activeTab === tab.id ? "active" : "inactive"}
                   whileHover={{ y: -2 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {/* <span>{tab.icon}</span> */}
                   <span>{tab.name}</span>
                 </motion.button>
               ))}
             </nav>
           </div>
         </motion.div>
+
 
         {/* Tab Content */}
         <AnimatePresence mode="wait">
@@ -463,8 +470,8 @@ function EmployeeDashboard() {
                         <p className="text-gray-900">{new Date(currentEmployment.joiningDate).toLocaleDateString()}</p>
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
-                        <p className="text-gray-900">{currentEmployment.location}</p>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Company Handle</label>
+                        <p className="text-gray-900">{currentEmployment.companyHandle ? `@${currentEmployment.companyHandle}` : 'Not specified'}</p>
                       </div>
                     </motion.div>
                   )}
@@ -823,7 +830,7 @@ function EmployeeDashboard() {
                                 <span className="font-medium">Duration:</span> {new Date(employment.joiningDate).toLocaleDateString()} - {employment.endDate ? new Date(employment.endDate).toLocaleDateString() : 'Present'}
                               </div>
                               <div>
-                                <span className="font-medium">Location:</span> {employment.location}
+                                <span className="font-medium">Company Handle:</span> {employment.companyHandle ? `@${employment.companyHandle}` : 'Not specified'}
                               </div>
                               <div>
                                 <span className="font-medium">Type:</span> {employment.employmentType}
@@ -1003,11 +1010,18 @@ function EmployeeDashboard() {
                           onChange={(e) => setNewEmploymentForm(prev => ({ ...prev, joiningDate: e.target.value }))}
                         />
                         <Input
-                          label="Location"
-                          placeholder="e.g., San Francisco, CA"
-                          value={newEmploymentForm.location}
-                          onChange={(e) => setNewEmploymentForm(prev => ({ ...prev, location: e.target.value }))}
+                          label="Company Handle"
+                          placeholder="e.g., @sunlighter or sunlighter"
+                          value={newEmploymentForm.companyHandle}
+                          onChange={(e) => {
+                            // Remove @ symbol if present and convert to lowercase
+                            let value = e.target.value.replace('@', '').toLowerCase();
+                            setNewEmploymentForm(prev => ({ ...prev, companyHandle: value }));
+                          }}
                         />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Enter the company&apos;s handle (without @). Verification requests will be sent directly to this company account.
+                        </p>
                       </div>
                       
                       <div className="grid md:grid-cols-2 gap-4">

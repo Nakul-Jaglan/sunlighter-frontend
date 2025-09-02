@@ -10,7 +10,7 @@ import Button from '@/components/Button'
 import Input from '@/components/Input'
 
 function EmployerDashboard() {
-  const { user, logout } = useAuth()
+  const { user, isLoading:loading, logout } = useAuth()
   const [activeTab, setActiveTab] = useState('verify')
   const [verificationCode, setVerificationCode] = useState('')
   const [verificationResult, setVerificationResult] = useState(null)
@@ -23,7 +23,9 @@ function EmployerDashboard() {
   const [verificationRequests, setVerificationRequests] = useState([])
 
   useEffect(() => {
+    if (loading) return
     if (!user || user.user_type !== 'employer') {
+      console.log(user, "User is not an employer");
       window.location.href = '/login'
       return
     }
@@ -173,7 +175,7 @@ function EmployerDashboard() {
   return (
     <Layout title="Employer Dashboard - SunLighter">
       <motion.div
-        className="max-w-7xl mx-auto"
+        className="max-w-7xl mx-auto min-w-3xl"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -227,7 +229,7 @@ function EmployerDashboard() {
         {/* Navigation Tabs */}
         <motion.div className="mb-8" variants={itemVariants}>
           <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8 overflow-x-auto">
+            <nav className="-mb-px flex space-x-8 overflow-x-auto justify-center">
               {tabs.map((tab) => (
                 <motion.button
                   key={tab.id}

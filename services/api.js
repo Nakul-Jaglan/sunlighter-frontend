@@ -184,7 +184,7 @@ class ApiService {
 
   // Authentication APIs
   async register(userData) {
-    const response = await this.request('/auth/register', {
+    const response = await this.request('/auth/employee/register', {
       method: 'POST',
       body: JSON.stringify(userData)
     })
@@ -226,7 +226,7 @@ class ApiService {
 
   // User APIs
   async getCurrentUser() {
-    return await this.request('/users/me')
+    return await this.request('/employees/me')
   }
 
   async updateProfile(userData) {
@@ -297,6 +297,34 @@ class ApiService {
     return await this.request('/access-logs/')
   }
 
+  // Employment Verification Request APIs
+  async createEmploymentVerificationRequest(requestData) {
+    return await this.request('/employment-verification-requests/', {
+      method: 'POST',
+      body: JSON.stringify(requestData)
+    })
+  }
+
+  async getMyVerificationRequests(skip = 0, limit = 100) {
+    return await this.request(`/employment-verification-requests/my-requests?skip=${skip}&limit=${limit}`)
+  }
+
+  async getPendingVerificationRequests(skip = 0, limit = 100, status = null) {
+    const statusParam = status ? `&status=${status}` : ''
+    return await this.request(`/employment-verification-requests/pending?skip=${skip}&limit=${limit}${statusParam}`)
+  }
+
+  async updateVerificationRequestStatus(requestId, statusData) {
+    return await this.request(`/employment-verification-requests/${requestId}/status`, {
+      method: 'PUT',
+      body: JSON.stringify(statusData)
+    })
+  }
+
+  async getVerificationStats() {
+    return await this.request('/employment-verification-requests/stats')
+  }
+
   // Admin APIs (for employers)
   async searchUsers(query) {
     return await this.request(`/admin/users/search?q=${encodeURIComponent(query)}`)
@@ -346,6 +374,7 @@ export const auth = {
   login: (email, password) => apiService.login(email, password),
   logout: () => apiService.logout(),
   getCurrentUser: () => apiService.getCurrentUser(),
+  updateProfile: (userData) => apiService.updateProfile(userData)
 }
 
 export const employment = {
@@ -363,6 +392,14 @@ export const verification = {
   verify: (code) => apiService.verifyCode(code), // Alias for easier use
   revokeCode: (id) => apiService.revokeVerificationCode(id),
   getAccessLogs: () => apiService.getAccessLogs(),
+}
+
+export const employmentVerification = {
+  createRequest: (data) => apiService.createEmploymentVerificationRequest(data),
+  getMyRequests: (skip, limit) => apiService.getMyVerificationRequests(skip, limit),
+  getPendingRequests: (skip, limit, status) => apiService.getPendingVerificationRequests(skip, limit, status),
+  updateRequestStatus: (id, data) => apiService.updateVerificationRequestStatus(id, data),
+  getStats: () => apiService.getVerificationStats(),
 }
 
 export const admin = {
@@ -383,6 +420,7 @@ export const api = {
   auth,
   employment,
   verification,
+  employmentVerification,
   admin,
   employer,
 }

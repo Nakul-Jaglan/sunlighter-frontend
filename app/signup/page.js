@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../services/api'
-import Layout from '../../components/layout/Layout'
+import Layout from '@/components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
@@ -17,9 +17,6 @@ function SignUpPage() {
     fullName: "",
     email: "",
     password: "",
-    
-    // Employee fields
-    country: "",
     
     // Employer fields
     organizationName: "",
@@ -87,7 +84,6 @@ function SignUpPage() {
           email: formData.email,
           password: formData.password,
           user_type: 'employee',
-          location: formData.country  // Backend expects 'location' instead of 'country'
         }
       } else if (userType === 'employer') {
         registrationData = {
@@ -142,7 +138,6 @@ function SignUpPage() {
       fullName: "",
       email: "",
       password: "",
-      country: "",
       // timezone: "", // Removed since it's not in the form
       organizationName: "",
       designation: "",
@@ -400,30 +395,6 @@ function SignUpPage() {
                     />
                   </motion.div>
 
-                  {/* User Type Specific Fields */}
-                  {userType === 'employee' && (
-                    <>
-                      <motion.div variants={itemVariants}>
-                        <Input
-                          label="Country"
-                          placeholder="Select your country"
-                          value={formData.country}
-                          onChange={(e) => handleInputChange("country", e.target.value)}
-                          required
-                        />
-                      </motion.div>
-
-                      {/* <motion.div variants={itemVariants}>
-                        <Input
-                          label="Time Zone"
-                          placeholder="Select your time zone"
-                          value={formData.timezone}
-                          onChange={(e) => handleInputChange("timezone", e.target.value)}
-                          required
-                        />
-                      </motion.div> */}
-                    </>
-                  )}
 
                   {userType === 'employer' && (
                     <>

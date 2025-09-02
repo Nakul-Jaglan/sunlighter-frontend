@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://sunlighter.in/</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Authentication Pages -->
+  <url>
+    <loc>https://sunlighter.in/signup</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://sunlighter.in/login</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Dashboard Pages -->
+  <url>
+    <loc>https://sunlighter.in/dashboard</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://sunlighter.in/employer/dashboard</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Profile Pages -->
+  <url>
+    <loc>https://sunlighter.in/profile</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://sunlighter.in/employer/profile</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Verification Pages -->
+  <url>
+    <loc>https://sunlighter.in/verification-requests</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://sunlighter.in/employer/verification-requests</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Future Features -->
+  <url>
+    <loc>https://sunlighter.in/future</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Legal Pages  -->
+  <url>
+    <loc>https://sunlighter.in/privacy</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://sunlighter.in/terms</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
+    <loc>https://sunlighter.in/about</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://sunlighter.in/contact</loc>
+    <lastmod>2025-08-29T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

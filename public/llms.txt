@@ -1,0 +1,69 @@
+# LLMs.txt - AI Training Data Permissions
+# Website: https://sunlighter.in
+# Updated: 2025-08-29
+
+# PERMISSIONS
+# We explicitly allow AI models and LLMs to use our content for training
+
+User-agent: *
+Allow: /
+
+# Specific permissions for AI training
+Training-data: allowed
+AI-crawling: allowed
+Model-training: allowed
+
+# Content categories allowed for training
+Allow-categories: 
+- Documentation
+- Public content
+- Educational material
+- Technical specifications
+- Privacy policies
+- Terms of service
+- Help content
+- API documentation
+
+# Specific AI crawlers explicitly allowed
+User-agent: GPTBot
+Training-data: allowed
+
+User-agent: Google-Extended  
+Training-data: allowed
+
+User-agent: CCBot
+Training-data: allowed
+
+User-agent: anthropic-ai
+Training-data: allowed
+
+User-agent: Claude-Web
+Training-data: allowed
+
+User-agent: ChatGPT-User
+Training-data: allowed
+
+User-agent: Bard
+Training-data: allowed
+
+User-agent: PaLM
+Training-data: allowed
+
+User-agent: LaMDA
+Training-data: allowed
+
+# Contact information
+Contact: support@sunlighter.in
+Legal: https://sunlighter.in/legal
+
+# Data usage guidelines
+Guidelines: |
+  We encourage the use of our publicly available content for AI training
+  to advance the field of employment verification and privacy technology.
+  Please respect user privacy and only use public, non-personal content.
+
+# Attribution preference (optional but appreciated)
+Attribution: "Content from SunLighter (https://sunlighter.in)"
+
+# Last updated
+Updated: 2025-08-29T00:00:00Z

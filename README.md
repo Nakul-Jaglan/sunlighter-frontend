@@ -7,7 +7,7 @@
 
 > **Privacy-first employment verification platform**
 >
-> Live: [https://sunlighter.nakul.click](https://sunlighter.nakul.click)
+> Live: [https://sunlighter.in](https://sunlighter.in)
 
 ---
 
@@ -68,7 +68,7 @@ SunLighter is a modern platform for secure, privacy-focused employment verificat
 |-----------------------|------------------------------------|
 | NEXT_PUBLIC_API_URL   | Backend API base URL (required)    |
 
-**Never commit secrets or production credentials to the repo.**
+**Never commit secrets the repo.**
 
 ---
 
@@ -76,7 +76,7 @@ SunLighter is a modern platform for secure, privacy-focused employment verificat
 
 - Deploys instantly on [Vercel](https://vercel.com/)
 - Set `NEXT_PUBLIC_API_URL` in Vercel project settings
-- [Live Demo](https://sunlighter.nakul.click)
+- [Live Demo](https://sunlighter.in)
 
 ---
 
