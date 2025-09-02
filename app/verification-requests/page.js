@@ -8,13 +8,12 @@ import useAuthStore from '@/stores/authStore'
 export default function VerificationRequestsPage() {
   const user = useAuthStore(state => state.user)
   const loading = useAuthStore(state => state.isLoading)
+  const userType = useAuthStore(state => state.userType)
   const router = useRouter()
 
   useEffect(() => {
     if (!loading) {
-      if (!user) {
-        router.push('/register')
-      } else if (user.user_type !== 'employee') {
+      if (userType !== 'employees') {
         router.push('/dashboard')
       }
     }
@@ -28,7 +27,7 @@ export default function VerificationRequestsPage() {
     )
   }
 
-  if (!user || user.user_type !== 'employee') {
+  if (!user || userType !== 'employees') {
     return null
   }
 
