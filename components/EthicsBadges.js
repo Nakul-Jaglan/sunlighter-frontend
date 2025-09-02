@@ -322,7 +322,7 @@ const AddBadgeModal = ({ isOpen, onClose, onAdd }) => {
                 <div>
                   <h4 className="text-sm font-medium text-blue-800">Verification Process</h4>
                   <p className="text-sm text-blue-700 mt-1">
-                    This badge will be marked as "Self-Claimed" until verified by your employer. 
+                    This badge will be marked as &quot;Self-Claimed&quot; until verified by your employer. 
                     Only factual elements can be verified, not opinions or subjective assessments.
                   </p>
                 </div>

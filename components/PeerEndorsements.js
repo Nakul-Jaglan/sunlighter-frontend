@@ -79,7 +79,7 @@ const EndorsementCard = ({ endorsement, onRespond }) => {
 
       <div className="mb-4">
         <p className="text-gray-800 leading-relaxed">
-          "{endorsement.message}"
+          &quot;{endorsement.message}&quot;
         </p>
       </div>
 

@@ -233,7 +233,7 @@ const RefreshModal = ({ item, isOpen, onClose, onConfirm }) => {
               <div>
                 <h5 className="text-sm font-medium text-yellow-800">About Refreshing</h5>
                 <p className="text-sm text-yellow-700 mt-1">
-                  We'll reach out to the original source to update this item with current information. 
+                  We&apos;ll reach out to the original source to update this item with current information. 
                   The refresh extends the expiry date by 1 year from approval.
                 </p>
               </div>
@@ -534,7 +534,7 @@ export default function ReputationLedger() {
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• <strong>Fair & Current:</strong> All items expire after 1 year to keep reputation current</li>
               <li>• <strong>Refresh System:</strong> Request updates from original sources before expiration</li>
-              <li>• <strong>Growth-Focused:</strong> No permanent "black marks" - everyone can improve</li>
+              <li>• <strong>Growth-Focused:</strong> No permanent &quot;black marks&quot; - everyone can improve</li>
               <li>• <strong>Archive Option:</strong> Keep expired items for personal reference</li>
               <li>• <strong>Transparent:</strong> All dates and sources are clearly visible</li>
             </ul>
