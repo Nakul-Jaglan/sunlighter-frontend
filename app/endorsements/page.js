@@ -1,12 +1,13 @@
 'use client'
 import Layout from '@/components/layout/Layout'
 import PeerEndorsements from '@/components/PeerEndorsements'
-import { useAuth } from '@/contexts/AuthContext'
+import useAuthStore from '@/stores/authStore'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 export default function PeerEndorsementsPage() {
-  const { user, loading } = useAuth()
+  const user = useAuthStore(state => state.user)
+  const loading = useAuthStore(state => state.isLoading)
   const router = useRouter()
 
   useEffect(() => {

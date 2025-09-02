@@ -1,12 +1,13 @@
 'use client'
 import Layout from '@/components/layout/Layout'
 import CommunityTrustScore from '@/components/CommunityTrustScore'
-import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import useAuthStore from '@/stores/authStore'
 
 export default function TrustScorePage() {
-  const { user, loading } = useAuth()
+  const user = useAuthStore(state => state.user)
+  const loading = useAuthStore(state => state.isLoading)
   const router = useRouter()
 
   useEffect(() => {
