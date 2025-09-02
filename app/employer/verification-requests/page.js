@@ -1,19 +1,21 @@
 'use client'
 import Layout from '@/components/layout/Layout'
 import EmployerVerificationRequests from '@/components/EmployerVerificationRequests'
-import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import useAuthStore from '@/stores/authStore'
 
 export default function EmployerVerificationPage() {
-  const { user, loading } = useAuth()
+  const user = useAuthStore(state => state.user)
+  const loading = useAuthStore(state => state.isLoading)
+  const userType = useAuthStore(state => state.userType)
   const router = useRouter()
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
         router.push('/register')
-      } else if (user.user_type !== 'employer') {
+      } else if (userType !== 'employers') {
         router.push('/dashboard')
       }
     }
@@ -27,7 +29,7 @@ export default function EmployerVerificationPage() {
     )
   }
 
-  if (!user || user.user_type !== 'employer') {
+  if (!user || localStorage.getItem('userType') !== 'employers') {
     return null
   }
 

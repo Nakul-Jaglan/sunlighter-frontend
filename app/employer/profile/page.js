@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useAuth } from '../../../contexts/AuthContext'
 import Layout from '../../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
+import useAuthStore from "@/stores/authStore"
 
 function EmployerProfilePage() {
-  const { user, updateProfile, isLoading } = useAuth()
+  const user = useAuthStore(state => state.user)
+  const updateProfile = useAuthStore(state => state.updateProfile)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [message, setMessage] = useState({ type: '', text: '' })

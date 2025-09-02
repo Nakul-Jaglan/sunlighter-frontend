@@ -1,19 +1,28 @@
-"use client"
-
-import { useEffect, useState } from "react"
+"use client";
+import { use, useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useAuth } from '../../contexts/AuthContext'
 import Layout from '../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
+import { useRouter } from "next/navigation"
+import useAuthStore from "@/stores/authStore";
+
 
 function LoginPage() {
-  const { login, isLoading, error, clearError, user } = useAuth()
+  const login = useAuthStore(state => state.login)
+  const isLoading = useAuthStore(state => state.isLoading)
+  const error = useAuthStore(state => state.error)
+  const clearError = useAuthStore(state => state.clearError)
+  const user = useAuthStore(state => state.user)
+
   const [userType, setUserType] = useState(null) // 'employee' or 'employer'
+  const [isCompanyLogin, setIsCompanyLogin] = useState(false) // Track if showing company login
+  const router = useRouter()
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    companyHandle: "", // For company login
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
@@ -32,27 +41,49 @@ function LoginPage() {
   useEffect(()=>{
     if (user) {
       console.log("User logged in:", user);
-      const redirectPath = user.user_type === 'employer' ? '/employer/dashboard' : '/dashboard'
-      window.location.href = redirectPath
+      let redirectPath = '/dashboard' // Default
+      
+      if (userType === 'employer' && isCompanyLogin) {
+        redirectPath = '/company/dashboard'
+      } else if (user.user_type === 'employer') {
+        redirectPath = '/employer/dashboard'
+      } else if (user.user_type === 'company') {
+        redirectPath = '/company/dashboard'
+      }
+      
+      router.push(redirectPath)
     }
-  }, [user]);
+  }, [user, userType, isCompanyLogin]);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitted(true)
     
     try {
-      const result = await login(formData.email, formData.password)
+      // Determine login credentials based on login type
+      let loginEmail = formData.email
       
+      // For company login, if using company handle, we might need special handling
+      if (userType === 'employer' && isCompanyLogin && formData.companyHandle) {
+        // If company handle is provided, use it as the identifier
+        loginEmail = formData.companyHandle
+      }
+
+      const result = await login(loginEmail, formData.password, isCompanyLogin ? 'companies' : userType === 'employee' ? 'employees' : 'employers')
+      console.log(result, "result")
       if (result.success) {
-        // Redirect based on user role
-        const redirectPath = result.user.user_type === 'employer' ? '/employer/dashboard' : '/dashboard'
-        window.location.href = redirectPath
-        
+        // Redirect based on login type and user role
+        let redirectPath = '/dashboard' // Default
+        console.log(userType, "userType")
+        if (userType === 'employer' && isCompanyLogin) {
+          redirectPath = '/company/dashboard'
+        } else if (userType === 'employer') {
+          redirectPath = '/employer/dashboard'
+        }
+        router.push(redirectPath)
       }
     } catch (error) {
       console.error('Login error:', error)
-      console.log(result)
     } finally {
       setIsSubmitted(false)
     }
@@ -60,11 +91,26 @@ function LoginPage() {
 
   const handleUserTypeSelect = (type) => {
     setUserType(type)
+    setIsCompanyLogin(false) // Reset company login state
     // Reset form data when switching user types
     setFormData({
       email: "",
       password: "",
+      companyHandle: "",
     })
+  }
+
+  const handleCompanyLoginToggle = () => {
+    setIsCompanyLogin(!isCompanyLogin)
+    // Clear form data when switching between employer and company login
+    setFormData({
+      email: "",
+      password: "",
+      companyHandle: "",
+    })
+    if (error) {
+      clearError()
+    }
   }
 
   const containerVariants = {
@@ -137,6 +183,23 @@ function LoginPage() {
     }
   }
 
+  const flipVariants = {
+    front: {
+      rotateY: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeInOut"
+      }
+    },
+    back: {
+      rotateY: 180,
+      transition: {
+        duration: 0.6,
+        ease: "easeInOut"
+      }
+    }
+  }
+
   if (isSubmitted) {
     return (
       <Layout title="Signing In - SunLighter">
@@ -160,7 +223,7 @@ function LoginPage() {
                 </motion.div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Signing you in...</h2>
                 <p className="text-gray-600">
-                  Welcome back! Redirecting to your {userType === 'employee' ? 'employee' : 'employer'} dashboard.
+                  Welcome back! Redirecting to your {userType === 'employee' ? 'employee' : (isCompanyLogin ? 'company' : 'employer')} dashboard.
                 </p>
               </motion.div>
             </Card>
@@ -235,7 +298,7 @@ function LoginPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Employer / HR</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Company / Employer</h3>
                         <p className="text-sm text-gray-600">
                           Manage employee verifications and hiring
                         </p>
@@ -261,169 +324,274 @@ function LoginPage() {
               initial="hidden"
               animate="visible"
               exit="exit"
+              style={{ perspective: "1000px" }}
             >
-              <Card className="p-8">
-                <motion.div className="flex items-center justify-between mb-8 gap-8" variants={itemVariants}>
-                  <motion.button
-                    onClick={() => setUserType(null)}
-                    className="text-gray-500 cursor-pointer hover:text-gray-700 transition-colors duration-200"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                  </motion.button>
-
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      {userType === 'employee' ? 'Employee Sign In' : 'Employer Sign In'}
-                    </h2>
-                    <p className="text-gray-600">
-                      {userType === 'employee' 
-                        ? 'Access your professional verification dashboard'
-                        : 'Manage your organization and employee verifications'
-                      }
-                    </p>
-                  </div>
-                </motion.div>
-
-                <motion.form onSubmit={handleSubmit} className="space-y-6" variants={itemVariants}>
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md"
-                    >
-                      <div className="flex items-start">
-                        <svg className="w-5 h-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                        <div>
-                          <p className="font-medium">Login Failed</p>
-                          <p className="mt-1 text-sm">{error}</p>
-                          {error.includes('Server error') && (
-                            <div className="mt-2 text-xs text-red-600">
-                              <p>• The backend service is currently experiencing technical issues</p>
-                              <p>• This may be due to database maintenance or deployment updates</p>
-                              <p>• Please try again in a few minutes or contact support</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                  
-                  <motion.div variants={itemVariants}>
-                    <Input
-                      label="Email Address"
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      required
-                    />
-                  </motion.div>
-
-                  <motion.div variants={itemVariants}>
-                    <Input
-                      label="Password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={formData.password}
-                      onChange={(e) => handleInputChange("password", e.target.value)}
-                      required
-                    />
-                  </motion.div>
-
-                  {/* <motion.div className="flex items-center justify-between" variants={itemVariants}>
-                    <label className="flex items-center">
-                      <motion.input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+              <motion.div
+                variants={flipVariants}
+                animate={userType === 'employer' && isCompanyLogin ? "back" : "front"}
+                style={{ transformStyle: "preserve-3d" }}
+              >
+                {/* Front Side - Employee or Employer Login */}
+                <motion.div
+                  className="max-w-[500px] dashboard"
+                  style={{ 
+                    backfaceVisibility: "hidden",
+                    position: userType === 'employer' && isCompanyLogin ? "absolute" : "relative",
+                    width: "100%"
+                  }}
+                >
+                  <Card className="p-8">
+                    <motion.div className="flex items-center justify-between mb-8 gap-8" variants={itemVariants}>
+                      <motion.button
+                        onClick={() => {
+                          setUserType(null)
+                          setIsCompanyLogin(false)
+                        }}
+                        className="text-gray-500 cursor-pointer hover:text-gray-700 transition-colors duration-200"
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                      />
-                      <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                    </label>
-                    <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 transition-colors duration-200">
-                      Forgot password?
-                    </a>
-                  </motion.div> */}
-
-                  <motion.div variants={itemVariants}>
-                    <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                      <Button 
-                        type="submit" 
-                        className="w-full py-3"
-                        disabled={isLoading || isSubmitted}
                       >
-                        {isLoading || isSubmitted ? (
-                          <div className="flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                            Signing in...
-                          </div>
-                        ) : (
-                          `Sign In as ${userType === 'employee' ? 'Employee' : 'Employer'}`
-                        )}
-                      </Button>
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                      </motion.button>
+
+                      <div className="flex-1 text-center">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-2 whitespace-nowrap">
+                          {userType === 'employee' ? 'Employee Sign In' : 'Employer Sign In'}
+                        </h2>
+                        <p className="text-gray-600 whitespace-nowrap">
+                          {userType === 'employee' 
+                            ? 'Access your professional verification dashboard'
+                            : 'Manage your organization dashboard'
+                          }
+                        </p>
+                      </div>
+
+                      {userType === 'employer' && (
+                        <motion.button
+                          onClick={handleCompanyLoginToggle}
+                          className="text-blue-600 hover:text-blue-700 transition-colors duration-200 text-sm font-medium whitespace-nowrap"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          Company Login
+                        </motion.button>
+                      )}
                     </motion.div>
-                  </motion.div>
-                </motion.form>
 
-                {/* <motion.div className="mt-6" variants={itemVariants}>
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">Or continue with</span>
-                    </div>
-                  </div>
+                    <motion.form onSubmit={handleSubmit} className="space-y-6" variants={itemVariants}>
+                      {error && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md"
+                        >
+                          <div className="flex items-start">
+                            <svg className="w-5 h-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                            <div>
+                              <p className="font-medium">Login Failed</p>
+                              <p className="mt-1 text-sm">{error}</p>
+                              {error.includes('Server error') && (
+                                <div className="mt-2 text-xs text-red-600">
+                                  <p>• The backend service is currently experiencing technical issues</p>
+                                  <p>• This may be due to database maintenance or deployment updates</p>
+                                  <p>• Please try again in a few minutes or contact support</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                      
+                      <motion.div variants={itemVariants}>
+                        <Input
+                          label="Email Address"
+                          type="email"
+                          placeholder="Enter your email address"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange("email", e.target.value)}
+                          required
+                        />
+                      </motion.div>
 
-                  <div className="mt-6 grid grid-cols-2 gap-3">
-                    <motion.button
-                      type="button"
-                      className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
-                      variants={buttonVariants}
-                      whileHover="hover"
-                      whileTap="tap"
-                    >
-                      <svg className="w-5 h-5" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                      </svg>
-                      <span className="ml-2">Google</span>
-                    </motion.button>
+                      <motion.div variants={itemVariants}>
+                        <Input
+                          label="Password"
+                          type="password"
+                          placeholder="Enter your password"
+                          value={formData.password}
+                          onChange={(e) => handleInputChange("password", e.target.value)}
+                          required
+                        />
+                      </motion.div>
 
-                    <motion.button
-                      type="button"
-                      className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors duration-200"
-                      variants={buttonVariants}
-                      whileHover="hover"
-                      whileTap="tap"
-                    >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                      </svg>
-                      <span className="ml-2">LinkedIn</span>
-                    </motion.button>
-                  </div>
-                </motion.div> */}
+                      <motion.div variants={itemVariants}>
+                        <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                          <Button 
+                            type="submit" 
+                            className="w-full py-3"
+                            disabled={isLoading || isSubmitted}
+                          >
+                            {isLoading || isSubmitted ? (
+                              <div className="flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                Signing in...
+                              </div>
+                            ) : (
+                              `Sign In as ${userType === 'employee' ? 'Employee' : 'Employer'}`
+                            )}
+                          </Button>
+                        </motion.div>
+                      </motion.div>
+                    </motion.form>
 
-                <motion.div className="mt-8 text-center" variants={itemVariants}>
-                  <p className="text-sm text-gray-600">
-                    Don&apos;t have an account?{" "}
-                    <a href="/signup" className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200">
-                      Sign up here
-                    </a>
-                  </p>
+                    <motion.div className="mt-8 text-center" variants={itemVariants}>
+                      <p className="text-sm text-gray-600">
+                        Don&apos;t have an account?{" "}
+                        <a href="/signup" className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200">
+                          Sign up here
+                        </a>
+                      </p>
+                    </motion.div>
+                  </Card>
                 </motion.div>
-              </Card>
+
+                {/* Back Side - Company Login */}
+                {userType === 'employer' && (
+                  <motion.div
+                    className="max-w-[500px] min-w-[500px]"
+                    style={{ 
+                      backfaceVisibility: "hidden",
+                      transform: "rotateY(180deg)",
+                      position: isCompanyLogin ? "relative" : "absolute",
+                      width: "100%",
+                      top: "0%"
+                    }}
+                  >
+                    <Card className="p-8 max-h-[500px]" >
+                      <motion.div className="flex items-center justify-between mb-8 gap-8" variants={itemVariants}>
+                        <motion.button
+                          onClick={() => {
+                            setUserType(null)
+                            setIsCompanyLogin(false)
+                          }}
+                          className="text-gray-500 cursor-pointer hover:text-gray-700 transition-colors duration-200"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                          </svg>
+                        </motion.button>
+
+                        <div className="flex-1 text-center">
+                          <h2 className="text-2xl font-bold text-gray-900 mb-2">Company Sign In</h2>
+                          <p className="text-gray-600">
+                            Access your company dashboard
+                          </p>
+                        </div>
+
+                        <motion.button
+                          onClick={handleCompanyLoginToggle}
+                          className="text-green-600 hover:text-green-700 transition-colors duration-200 text-sm font-medium"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          Employer Login
+                        </motion.button>
+                      </motion.div>
+
+                      <motion.form onSubmit={handleSubmit} className="space-y-6" variants={itemVariants}>
+                        {error && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md"
+                          >
+                            <div className="flex items-start">
+                              <svg className="w-5 h-5 text-red-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                              </svg>
+                              <div>
+                                <p className="font-medium">Login Failed</p>
+                                <p className="mt-1 text-sm">{error}</p>
+                                {error.includes('Server error') && (
+                                  <div className="mt-2 text-xs text-red-600">
+                                    <p>• The backend service is currently experiencing technical issues</p>
+                                    <p>• This may be due to database maintenance or deployment updates</p>
+                                    <p>• Please try again in a few minutes or contact support</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                        
+                        <motion.div variants={itemVariants}>
+                          <Input
+                            label="Company Handle or Email"
+                            placeholder="Enter company handle (@company) or email"
+                            value={formData.companyHandle || formData.email}
+                            onChange={(e) => {
+                              const value = e.target.value
+                              if (value.startsWith('@')) {
+                                handleInputChange("companyHandle", value)
+                                handleInputChange("email", "")
+                              } else {
+                                handleInputChange("email", value)
+                                handleInputChange("companyHandle", "")
+                              }
+                            }}
+                            required
+                          />
+                        </motion.div>
+
+                        <motion.div variants={itemVariants}>
+                          <Input
+                            label="Password"
+                            type="password"
+                            placeholder="Enter your password"
+                            value={formData.password}
+                            onChange={(e) => handleInputChange("password", e.target.value)}
+                            required
+                          />
+                        </motion.div>
+
+                        <motion.div variants={itemVariants}>
+                          <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                            <Button 
+                              type="submit" 
+                              className="w-full py-3"
+                              disabled={isLoading || isSubmitted}
+                            >
+                              {isLoading || isSubmitted ? (
+                                <div className="flex items-center justify-center">
+                                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                  Signing in...
+                                </div>
+                              ) : (
+                                "Sign In as Company"
+                              )}
+                            </Button>
+                          </motion.div>
+                        </motion.div>
+                      </motion.form>
+
+                      <motion.div className="mt-8 text-center" variants={itemVariants}>
+                        <p className="text-sm text-gray-600">
+                          Don&apos;t have an account?{" "}
+                          <a href="/signup" className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200">
+                            Sign up here
+                          </a>
+                        </p>
+                      </motion.div>
+                    </Card>
+                  </motion.div>
+                )}
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>

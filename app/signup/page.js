@@ -2,45 +2,41 @@
 
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../services/api'
 import Layout from '@/components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
+import useAuthStore from "@/stores/authStore"
 
 function SignUpPage() {
-  const { register, isLoading, error, clearError } = useAuth()
-  const [userType, setUserType] = useState(null) // 'employee' or 'employer'
+  const register = useAuthStore(state => state.register)
+  const isLoading = useAuthStore(state => state.isLoading)
+  const error = useAuthStore(state => state.error)
+  const clearError = useAuthStore(state => state.clearError)
+  const [userType, setUserType] = useState(null) // 'employee' or 'company'
   const [formData, setFormData] = useState({
     // Common fields
     fullName: "",
     email: "",
     password: "",
     
-    // Employer fields
-    organizationName: "",
-    designation: "",
+    // Company fields
+    companyName: "",
     companyHandle: "",
+    description: "",
+    website: "",
+    logoUrl: "",
+    industry: "",
+    companySize: "",
+    location: "",
+    contactEmail: "",
+    phoneNumber: "",
   })
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [userId, setUserId] = useState(null)
   const [companyId, setCompanyId] = useState(null)
   const [registrationError, setRegistrationError] = useState(null)
-
-    // Generate userId after successful submit
-    const generateUserId = () => {
-        if (userType === 'employee') {
-            return Math.floor(Math.random() * 900000) + 100000
-        } else if (userType === 'employer') {
-            return (
-                // (Math.floor(Math.random() * 900000) + 100000) + " & " +
-                (formData.companyHandle ? `@${formData.companyHandle}` : "")
-            )
-        }
-        return ""
-    }
-
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -54,18 +50,23 @@ function SignUpPage() {
       setRegistrationError(null)
     }
 
-    // Auto-suggest company handle from organization name for employers
-    if (field === "organizationName" && value.length >= 3 && userType === 'employer') {
-      const suggestedHandle = value
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "")
-        .substring(0, 15)
+    // Auto-suggest company handle from company name for companies
+    if (field === "companyName" && userType === 'company') {
+      if (value.length >= 3) {
+        const suggestedHandle = value
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "")
+          .substring(0, 15)
 
-      if (!formData.companyHandle) {
-        setFormData((prev) => ({
-          ...prev,
-          companyHandle: suggestedHandle,
-        }))
+          setFormData((prev) => ({
+            ...prev,
+            companyHandle: "@" + suggestedHandle,
+          }))
+        } else {
+          setFormData((prev) => ({
+            ...prev,
+            companyHandle: "@",
+          }))
       }
     }
   }
@@ -85,22 +86,31 @@ function SignUpPage() {
           password: formData.password,
           user_type: 'employee',
         }
-      } else if (userType === 'employer') {
+      } else if (userType === 'company') {
         registrationData = {
+          // Company admin/contact person details
           full_name: formData.fullName,
           email: formData.email,
           password: formData.password,
-          user_type: 'employer',
-          company_name: formData.organizationName,  // Backend expects 'company_name'
-          // Note: backend doesn't have designation or company_handle in the current schema
-          // but we can store designation in location or bio for now
-          location: formData.designation
+          user_type: 'company',
+          
+          // Company details
+          company_handle: formData.companyHandle.substring(1),
+          name: formData.companyName,
+          description: formData.description,
+          website: formData.website,
+          logo_url: formData.logoUrl,
+          industry: formData.industry,
+          company_size: formData.companySize,
+          location: formData.location,
+          contact_email: formData.contactEmail || formData.email, // Use main email if contact email not provided
+          phone_number: formData.phoneNumber
         }
       }
 
       console.log('Sending registration data:', registrationData) // Debug log
       
-      const result = await register(registrationData)
+      const result = await register(registrationData, userType)
       
       if (result.success) {
         // Backend now generates the appropriate IDs
@@ -138,10 +148,17 @@ function SignUpPage() {
       fullName: "",
       email: "",
       password: "",
-      // timezone: "", // Removed since it's not in the form
-      organizationName: "",
-      designation: "",
+      // Company fields
+      companyName: "",
       companyHandle: "",
+      description: "",
+      website: "",
+      logoUrl: "",
+      industry: "",
+      companySize: "",
+      location: "",
+      contactEmail: "",
+      phoneNumber: "",
     })
   }
 
@@ -219,7 +236,7 @@ function SignUpPage() {
                 </motion.div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Registration Successful!</h2>
                 <p className="text-gray-600 mb-4">
-                  Your {userType === 'employee' ? 'employee' : 'employer'} account has been created successfully.
+                  Your {userType === 'employee' ? 'employee' : 'company'} account has been created successfully.
                 </p>
                 <motion.div 
                   className="bg-blue-50 border border-blue-200 rounded-lg p-4"
@@ -238,7 +255,7 @@ function SignUpPage() {
               <motion.div variants={itemVariants}>
                 <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                   <Button onClick={() => {
-                    const redirectPath = userType === 'employer' ? '/employer/dashboard' : '/dashboard'
+                    const redirectPath = userType === 'company' ? '/company/dashboard' : '/dashboard'
                     window.location.href = redirectPath
                   }} className="py-2">
                     Go to Dashboard
@@ -307,7 +324,7 @@ function SignUpPage() {
                     variants={typeCardVariants}
                     whileHover="hover"
                     whileTap="tap"
-                    onClick={() => handleUserTypeSelect('employer')}
+                    onClick={() => handleUserTypeSelect('company')}
                     className="cursor-pointer"
                   >
                     <Card className="p-6 border-2 border-gray-200 hover:border-blue-500 transition-colors duration-200">
@@ -317,9 +334,9 @@ function SignUpPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Employer / HR</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Company</h3>
                         <p className="text-sm text-gray-600">
-                          Verify candidate employment history and streamline your hiring process
+                          Register your company to manage your team and verify employees
                         </p>
                       </div>
                     </Card>
@@ -350,12 +367,12 @@ function SignUpPage() {
 
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                      {userType === 'employee' ? 'Employee Registration' : 'Employer Registration'}
+                      {userType === 'employee' ? 'Employee Registration' : 'Company Registration'}
                     </h2>
                     <p className="text-gray-600">
                       {userType === 'employee' 
                         ? 'Create your professional verification profile'
-                        : 'Set up your organization for employee verification'
+                        : 'Register your company and start managing employee verifications'
                       }
                     </p>
                   </div>
@@ -373,47 +390,38 @@ function SignUpPage() {
                     </motion.div>
                   )}
 
-                  {/* Common Fields */}
-                  <motion.div variants={itemVariants}>
-                    <Input
-                      label="Full Name"
-                      placeholder="Enter your full name"
-                      value={formData.fullName}
-                      onChange={(e) => handleInputChange("fullName", e.target.value)}
-                      required
-                    />
-                  </motion.div>
+                  {userType === 'employee' && (<>
+                    <motion.div variants={itemVariants}>
+                      <Input
+                        label="Full Name"
+                        placeholder="Enter your full name"
+                        value={formData.fullName}
+                        onChange={(e) => handleInputChange("fullName", e.target.value)}
+                        required
+                      />
+                    </motion.div>
 
-                  <motion.div variants={itemVariants}>
-                    <Input
-                      label="Email Address"
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      required
-                    />
-                  </motion.div>
+                    <motion.div variants={itemVariants}>
+                      <Input
+                        label="Email Address"
+                        type="email"
+                        placeholder="Enter your email address"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        required
+                      />
+                    </motion.div>
+                  </>)}
 
 
-                  {userType === 'employer' && (
+                  {userType === 'company' && (
                     <>
                       <motion.div variants={itemVariants}>
                         <Input
-                          label="Organization Name"
-                          placeholder="Enter your organization name"
-                          value={formData.organizationName}
-                          onChange={(e) => handleInputChange("organizationName", e.target.value)}
-                          required
-                        />
-                      </motion.div>
-
-                      <motion.div variants={itemVariants}>
-                        <Input
-                          label="Designation"
-                          placeholder="Enter your job title"
-                          value={formData.designation}
-                          onChange={(e) => handleInputChange("designation", e.target.value)}
+                          label="Company Name"
+                          placeholder="Enter your company name"
+                          value={formData.companyName}
+                          onChange={(e) => handleInputChange("companyName", e.target.value)}
                           required
                         />
                       </motion.div>
@@ -427,8 +435,107 @@ function SignUpPage() {
                           minLength={3}
                           required
                         />
-                        <p className="text-xs text-gray-500 mt-1">This will be your unique identifier on the platform</p>
+                        <p className="text-xs text-gray-500 mt-1">This will be your unique identifier on the platform (e.g., @mycompany)</p>
                       </motion.div>
+
+                      <motion.div variants={itemVariants}>
+                        <Input
+                          label="Description"
+                          placeholder="Enter a brief description of your company"
+                          value={formData.description}
+                          onChange={(e) => handleInputChange("description", e.target.value)}
+                        />
+                      </motion.div>
+
+                      <motion.div variants={itemVariants}>
+                        <Input
+                          label="Website"
+                          type="url"
+                          placeholder="https://yourcompany.com"
+                          value={formData.website}
+                          onChange={(e) => handleInputChange("website", e.target.value)}
+                        />
+                      </motion.div>
+
+                      <motion.div variants={itemVariants}>
+                        <Input
+                          label="Logo URL"
+                          type="url"
+                          placeholder="https://yourcompany.com/logo.png"
+                          value={formData.logoUrl}
+                          onChange={(e) => handleInputChange("logoUrl", e.target.value)}
+                        />
+                      </motion.div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <motion.div variants={itemVariants}>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                          <select
+                            value={formData.industry}
+                            onChange={(e) => handleInputChange("industry", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="">Select Industry</option>
+                            <option value="technology">Technology</option>
+                            <option value="finance">Finance</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="education">Education</option>
+                            <option value="retail">Retail</option>
+                            <option value="manufacturing">Manufacturing</option>
+                            <option value="consulting">Consulting</option>
+                            <option value="media">Media</option>
+                            <option value="real_estate">Real Estate</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </motion.div>
+
+                        <motion.div variants={itemVariants}>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Company Size</label>
+                          <select
+                            value={formData.companySize}
+                            onChange={(e) => handleInputChange("companySize", e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          >
+                            <option value="">Select Company Size</option>
+                            <option value="startup">Startup (1-10 employees)</option>
+                            <option value="small">Small (11-50 employees)</option>
+                            <option value="medium">Medium (51-200 employees)</option>
+                            <option value="large">Large (201-1000 employees)</option>
+                            <option value="enterprise">Enterprise (1000+ employees)</option>
+                          </select>
+                        </motion.div>
+                      </div>
+
+                      <motion.div variants={itemVariants}>
+                        <Input
+                          label="Location"
+                          placeholder="Enter company location (e.g., San Francisco, CA)"
+                          value={formData.location}
+                          onChange={(e) => handleInputChange("location", e.target.value)}
+                        />
+                      </motion.div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <motion.div variants={itemVariants}>
+                          <Input
+                            label="Contact Email"
+                            type="email"
+                            placeholder="contact@yourcompany.com"
+                            value={formData.contactEmail}
+                            onChange={(e) => handleInputChange("contactEmail", e.target.value)}
+                          />
+                        </motion.div>
+
+                        <motion.div variants={itemVariants}>
+                          <Input
+                            label="Phone Number"
+                            type="tel"
+                            placeholder="+1 (555) 123-4567"
+                            value={formData.phoneNumber}
+                            onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                          />
+                        </motion.div>
+                      </div>
                     </>
                   )}
 
@@ -459,7 +566,7 @@ function SignUpPage() {
                             Creating Account...
                           </div>
                         ) : (
-                          `Create ${userType === 'employee' ? 'Employee' : 'Employer'} Account`
+                          `Create ${userType === 'employee' ? 'Employee' : 'Company'} Account`
                         )}
                       </Button>
                     </motion.div>

@@ -136,7 +136,7 @@ class ApiService {
   setTokens(accessToken, refreshToken) {
     this.token = accessToken
     this.refreshToken = refreshToken
-    
+
     if (typeof window !== 'undefined') {
       localStorage.setItem('accessToken', accessToken)
       localStorage.setItem('refreshToken', refreshToken)
@@ -183,8 +183,8 @@ class ApiService {
   }
 
   // Authentication APIs
-  async register(userData) {
-    const response = await this.request('/auth/employee/register', {
+  async register(userData, userType) {
+    const response = await this.request(`/auth/${userType}/register`, {
       method: 'POST',
       body: JSON.stringify(userData)
     })
@@ -196,7 +196,7 @@ class ApiService {
     return response
   }
 
-  async login(email, password) {
+  async login(email, password, userType) {
     // Create form data as expected by OAuth2PasswordRequestForm
     const formData = new FormData()
     formData.append('username', email)  // OAuth2 expects 'username' field
@@ -225,12 +225,13 @@ class ApiService {
   }
 
   // User APIs
-  async getCurrentUser() {
-    return await this.request('/employees/me')
+  async getCurrentUser(userType) {
+    if (!userType) return
+    return await this.request(`/${userType}/me`)
   }
 
-  async updateProfile(userData) {
-    return await this.request('/users/me', {
+  async updateProfile(userData, userType) {
+    return await this.request(`/${userType}/me`, {
       method: 'PUT',
       body: JSON.stringify(userData)
     })
@@ -370,11 +371,11 @@ export default apiService
 
 // Named exports for specific functionalities
 export const auth = {
-  register: (userData) => apiService.register(userData),
-  login: (email, password) => apiService.login(email, password),
+  register: (userData, userType) => apiService.register(userData, userType),
+  login: (email, password, userType) => apiService.login(email, password, userType),
   logout: () => apiService.logout(),
-  getCurrentUser: () => apiService.getCurrentUser(),
-  updateProfile: (userData) => apiService.updateProfile(userData)
+  getCurrentUser: (userType) => apiService.getCurrentUser(userType),
+  updateProfile: (userData, userType) => apiService.updateProfile(userData, userType)
 }
 
 export const employment = {

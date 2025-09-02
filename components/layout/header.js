@@ -4,11 +4,13 @@ import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-
 import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect } from "react"
-import { useAuth } from "../../contexts/AuthContext"
 import Button from "../Button"
+import useAuthStore from "@/stores/authStore"
 
 const Header = () => {
-  const { user, logout } = useAuth()
+  const user = useAuthStore(state => state.user)
+  const logout = useAuthStore(state => state.logout)
+  const userType = useAuthStore(state => state.userType)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
@@ -23,7 +25,7 @@ const Header = () => {
     if (!user) {
       return "/signup"
     }
-    return user.user_type === 'employer' ? '/employer/dashboard' : '/dashboard'
+    return userType === 'employers' ? '/employer/dashboard' : '/dashboard'
   }
 
   const navItems = [
@@ -268,7 +270,7 @@ const Header = () => {
                         >
                           Profile
                         </Link>
-                        {user.user_type === 'employee' && (
+                        {userType !== 'employers' && (
                           <Link
                             href="/verification-requests"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -277,7 +279,7 @@ const Header = () => {
                             Verification Requests
                           </Link>
                         )}
-                        {user.user_type === 'employer' && (
+                        {userType=== 'employers' && (
                           <Link
                             href="/employer/verification-requests"
                             className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"

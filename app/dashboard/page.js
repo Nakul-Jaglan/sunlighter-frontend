@@ -2,15 +2,18 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { useAuth } from '../../contexts/AuthContext'
 import { employment, verification } from '../../services/api'
 import Layout from '../../components/layout/Layout'
 import Card from '@/components/Card'
 import Button from '@/components/Button'
 import Input from '@/components/Input'
+import useAuthStore from "@/stores/authStore"
 
 function EmployeeDashboard() {
-  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
+  const user = useAuthStore(state => state.user)
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated)
+  const authLoading = useAuthStore(state => state.isLoading)
+
   const [activeTab, setActiveTab] = useState('overview')
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)

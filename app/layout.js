@@ -1,6 +1,5 @@
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "../contexts/AuthContext";
 import { Toaster } from "../components/ui/sonner";
 
 const ibmPlexSans = IBM_Plex_Sans({
@@ -170,10 +169,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${ibmPlexSans.variable} ${ibmPlexMono.variable} antialiased`}
       >
-        <AuthProvider>
           {children}
           <Toaster />
-        </AuthProvider>
       </body>
     </html>
   );
