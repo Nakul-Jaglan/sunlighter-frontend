@@ -238,7 +238,7 @@ function HomePage() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.2 }}
               >
-                <div className="flex justify-center mb-4">{item.icon}</div>
+                {/* <div className="flex justify-center mb-4">{item.icon}</div> */}
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.problem}</h3>
                 <p className="text-gray-600">{item.description}</p>
               </motion.div>
@@ -402,8 +402,8 @@ function HomePage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="flex justify-center mb-4">{useCase.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{useCase.title}</h3>
+                {/* <div className="flex justify-center mb-4">{useCase.icon}</div> */}
+                <h3 className="text-xl text-center font-semibold text-gray-900 mb-3">{useCase.title}</h3>
                 <p className="text-gray-600 mb-4">{useCase.description}</p>
                 <div className="space-y-1">
                   {useCase.examples.map((example, idx) => (
@@ -452,7 +452,7 @@ function HomePage() {
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
               >
                 <Card className="p-6 h-full hover:shadow-lg transition-shadow">
-                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  {/* <div className="text-4xl mb-4">{feature.icon}</div> */}
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
                   <p className="text-gray-600">{feature.description}</p>
                 </Card>
@@ -531,8 +531,8 @@ function HomePage() {
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
               >
                 <Card className="p-6 h-full hover:shadow-lg transition-shadow">
-                  <div className="flex justify-center mb-4">{feature.icon}</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                  {/* <div className="flex justify-center mb-4">{feature.icon}</div> */}
+                  <h3 className="text-xl text-center font-semibold text-gray-900 mb-3">{feature.title}</h3>
                   <p className="text-gray-600 mb-4">{feature.description}</p>
                   <div className="space-y-1">
                     {feature.features.map((feat, idx) => (
@@ -645,7 +645,7 @@ function HomePage() {
         </motion.section>
 
         {/* How It Works */}
-        <motion.section className="py-10 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl" variants={itemVariants}>
+        <motion.section className="py-10 rounded-2xl" variants={itemVariants}>
           <div className="text-center mb-16">
             <motion.h2 
               className="text-4xl font-bold text-gray-900 mb-4"

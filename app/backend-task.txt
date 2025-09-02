@@ -1,0 +1,155 @@
+Backend tasks for frontend features added (Peer Endorsements, Reputation Ledger, Ethics Badges, Behavioral Reliability, Community Trust Score)
+
+Summary of frontend work delivered (files added/modified):
+- New React components (mocked data + UI):
+  - components/PeerEndorsements.js  — Request modal, received/given lists, approve/decline flows
+  - components/EthicsBadges.js      — Add badge modal, self-claimed / request verification flow
+  - components/BehavioralReliability.js — Aggregated metrics UI, metric detail modal
+  - components/ReputationLedger.js — Time-limited reputation items, refresh/archive flows
+  - components/CommunityTrustScore.js — Overall trust score UI and component breakdown
+- Pages added to expose these features:
+  - app/endorsements/page.js
+  - app/badges/page.js
+  - app/reliability/page.js
+  - app/reputation/page.js
+  - app/trust-score/page.js
+- Dashboard updated to include a Reputation tab and quick links: app/dashboard/page.js
+
+Notes about current frontend implementation:
+- All data is mocked locally in the components. Calls to backend are TODOs and logged to console.
+- UX includes: request endorsement modal (email + values), approve/decline actions, add badge modal (self-claim + request employer verification), reputation items with expiry/refresh/archive, metric detail views and trust score breakdown.
+- Time-limited behavior assumed (items expire after set time) and refresh requests extend expiry on backend approval.
+- No backend integration implemented yet; components expect REST endpoints described below.
+
+High-priority backend work to be implemented
+(implement these to enable the UI end-to-end):
+
+1) Authentication / Authorization
+- Ensure endpoints accept and return access_token and refresh_token as used by frontend setTokens().
+- Protect endpoints with role checks: employee vs employer vs admin.
+- Provide endpoints:
+  - POST /auth/login  (OAuth2-compatible or return { access_token, refresh_token })
+  - POST /auth/refresh (accept refresh token in Authorization or body, return new access/refresh tokens)
+  - POST /auth/logout
+  - GET /employees/me
+
+2) Endorsements
+- Data model: Endorsement(id, endorser_name, endorser_email, endorser_role, endorser_company, endorsee_id, values[], message, status[pending/approved/rejected], requested_at, responded_at, expires_at)
+- Endpoints:
+  - POST /endorsements/requests  — create endorsement request (employee -> endorser email) (stores pending, sends notification/email)
+  - GET /endorsements/me?role=received|given  — returns endorsements for current user
+  - PUT /endorsements/{id}/respond  — { status: 'approved' | 'rejected' } (verify endorser identity or token)
+  - GET /endorsements/{id} — details
+  - DELETE /endorsements/{id} (soft-delete or archive)
+- Backend responsibilities:
+  - Generate one-time secure response tokens for emailed requests (endorser follows link to approve) or provide an auth flow for endorsers.
+  - Enforce consent and rate limits; store evidence of consent (timestamp, ip).
+  - Enforce expiry and scheduled cleanup (cron job to mark expired).
+
+3) Badges / Achievements
+- Data model: Badge(id, user_id, type, title, description, details, evidence, status[self-claimed, pending, verified, rejected], earned_at, verified_at, verified_by, expires_at)
+- Endpoints:
+  - POST /badges/ — add self-claimed badge
+  - POST /badges/{id}/verify-request — requests employer verification (notify employer)
+  - PUT /badges/{id}/verify — employer verifies factual elements (status -> verified, set verified_at, verified_by)
+  - GET /badges/me
+  - GET /badges/{user_id}
+- Backend responsibilities:
+  - Only verify factual fields (not opinions). Store verification audit trail.
+  - Support expiry and re-verification flows.
+
+4) Reputation Ledger (time-limited feedback)
+- Data model: ReputationItem(id, user_id, type[endorsement/review/feedback], source, content, rating, status[active, expiring, expired, archived, pending-refresh], created_at, expires_at, views)
+- Endpoints:
+  - GET /reputation?user_id=&status=&skip=&limit=
+  - POST /reputation/refresh-requests — request refresh of an item (sends notification to source)
+  - POST /reputation/{id}/archive
+  - POST /reputation/{id}/refresh-confirm — called when source confirms update
+- Backend responsibilities:
+  - Automatically compute status based on expires_at (active/expiring/expired).
+  - Provide ability to refresh expiry (extend on approval).
+  - Provide stats: GET /reputation/stats?user_id=
+
+5) Behavioral Reliability / Platform Connectors
+- Data model: BehavioralMetric(id, user_id, source_platform, total_projects, completion_rate, on_time_rate, refund_rate, avg_rating, history[], last_synced)
+- Endpoints:
+  - GET /behavioral-metrics?user_id=
+  - POST /platforms/connect — OAuth flow to connect external platforms (Upwork, Fiverr, etc.)
+  - Webhook endpoints for platforms to push anonymized/aggregated data
+- Backend responsibilities:
+  - Implement connectors (OAuth) to fetch user data, aggregate metrics, anonymize where required.
+  - Provide scheduled sync tasks and a queue for long-running fetches.
+  - Respect user consent before collecting/aggregating.
+
+6) Community Trust Score calculation
+- Data model: TrustScore(user_id, overall_score, breakdown{endorsements, badges, reliability, ledger}, history[], last_updated)
+- Endpoints:
+  - GET /trust-score?user_id= — returns overall score, component breakdown, insights, history
+  - POST /trust-score/recompute?user_id= — admin or scheduled recompute
+- Backend responsibilities:
+  - Implement scoring algorithm (weights configurable), time-weighting (recent items count more), normalization, and transparency: return component breakdown and sources.
+
+7) Notifications / Email
+- Endpoints / jobs for sending emails/notifications for:
+  - Endorsement request (with secure response link)
+  - Badge verification request to employer
+  - Reputation refresh requests
+  - Platform connection / OAuth status
+- Template management and ability to retry failed emails; webhook for delivery status.
+
+8) Audit / Security / Privacy
+- Store consent records: when a user requested an endorsement and endorser consented.
+- Audit logs for all verification actions (who verified what and when).
+- RBAC: employer can verify only employees connected to them or when given explicit permission.
+- Data retention policies: implement automatic expiry of reputation items (default 1 year), allow users to request deletion.
+- Ensure PII handling: do not expose private client details from platform connectors; keep aggregated/anonymized metrics.
+- Rate-limiting endpoints that trigger emails.
+
+9) Background jobs & scheduled tasks
+- Cron / background workers to:
+  - Mark expired endorsements/reputation items (daily)
+  - Recompute trust scores (periodic or on-change)
+  - Retry failed refresh/verifications and email jobs
+  - Sync connected platform data
+
+10) API contracts / examples (minimal)
+- POST /endorsements/requests
+  Request body: { endorser_email, endorser_name, endorser_role, endorser_company, endorsee_id, values:[], projectContext?, customMessage? }
+  Response: { id, status: 'pending', requestedAt, responseToken? }
+
+- PUT /endorsements/{id}/respond
+  Body: { status: 'approved'|'rejected', responder_id } (or use secure token in URL)
+  Response: { id, status, respondedAt }
+
+- POST /badges/{id}/verify-request
+  Body: { employer_id }
+  Response: { requestId, status: 'pending' }
+
+- GET /trust-score?user_id=
+  Response: { overallScore: number, trend: number, components: [{ id, score, maxScore, count, trend }], history: [...], insights: [...] }
+
+11) Data migrations & indexes
+- Add indexes on user_id, expires_at, status for quick queries.
+- Migrations for new tables: endorsements, badges, reputation_items, behavioral_metrics, trust_scores, refresh_requests.
+
+12) Tests & monitoring
+- Unit tests for scoring algorithm, refresh workflows, and permission checks.
+- Integration tests for email flows and platform connectors.
+- Add monitoring/alerts for background worker failures, email bounce rates, and connector sync errors.
+
+Priority roadmap (recommended):
+1) Auth token endpoints + user profile (enables login and secure API usage)
+2) Endorsements API + email flow (request/respond) + consent storage
+3) Badges endpoints + employer verification flow
+4) Reputation ledger CRUD + expiry/refresh mechanics
+5) Behavioral connectors (opt-in) + aggregation
+6) Trust score computation endpoint + history
+7) Notifications, background jobs, and monitoring
+
+Implementation notes / constraints:
+- All verification actions must store an audit trail (who/when/what).
+- Verify only factual claims during employer verification; disallow changing endorsement text by employer.
+- Design APIs to be idempotent where appropriate (refresh requests, verify actions).
+- Provide clear, consistent error messages and use HTTP status codes correctly for frontend to show user-friendly messages.
+
+If you want, I can scaffold example OpenAPI (Swagger) routes and minimal backend controller signatures to hand to backend engineers next.

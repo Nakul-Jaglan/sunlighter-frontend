@@ -5,7 +5,7 @@
 
 # 🌞 SunLighter
 
-> **Privacy-first employment verification platform**
+> **Privacy-first instant employment verification platform**
 >
 > Live: [https://sunlighter.in](https://sunlighter.in)
 
@@ -40,7 +40,7 @@ SunLighter is a modern platform for secure, privacy-focused employment verificat
 
 1. **Clone the repo:**
    ```bash
-   git clone https://github.com/your-username/sunlighter-frontend.git
+   git clone https://github.com/Nakul-Jaglan/sunlighter-frontend.git
    cd sunlighter-frontend
    ```
 2. **Install dependencies:**

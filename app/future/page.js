@@ -245,7 +245,7 @@ function FuturePlansPage() {
 
                     {/* Hover Effect Overlay */}
                     <motion.div
-                      className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none`}
+                      className={`absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-600 opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none`}
                     />
                   </Card>
                 </motion.div>
@@ -255,7 +255,7 @@ function FuturePlansPage() {
         </motion.section>
 
         {/* Vision Section */}
-        <motion.section
+        {/* <motion.section
           className="py-10 px-4 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 text-white"
           variants={itemVariants}
         >
@@ -297,11 +297,11 @@ function FuturePlansPage() {
               </div>
             </motion.div>
           </div>
-        </motion.section>
+        </motion.section> */}
 
         {/* CTA Section */}
         <motion.section
-          className="py-20 md:px-4 text-center"
+          className="py-10 md:px-4 text-center"
           variants={itemVariants}
         >
           <div className="max-w-4xl mx-auto">

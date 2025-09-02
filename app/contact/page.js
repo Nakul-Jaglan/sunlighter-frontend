@@ -161,7 +161,7 @@ function ContactPage() {
       action: 'https://wa.me/917988223181?text=Hello%20SunLighter%20Team'
     },
     {
-      icon: <FaPhone className="text-gray-600" />,
+      icon: <FaPhone className="text-gray-600 scale-x-[-1]" />,
       title: 'Phone Support',
       description: 'Get in touch via phone',
       contact: '+91 7988223181',

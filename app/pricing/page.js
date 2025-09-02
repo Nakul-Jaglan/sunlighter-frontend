@@ -149,7 +149,7 @@ function PricingPage() {
         </motion.div>
 
         {/* Coming Soon Section */}
-        <motion.div 
+        {/* <motion.div 
           className="text-center mb-20"
           variants={itemVariants}
         >
@@ -161,7 +161,6 @@ function PricingPage() {
             transition={{ duration: 0.6 }}
           >
             <div className="bg-gradient-to-r from-blue-600 to-cyan-400 rounded-2xl p-8 text-white relative overflow-hidden">
-              {/* Background decorations */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full transform translate-x-8 -translate-y-8"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full transform -translate-x-4 translate-y-4"></div>
               
@@ -195,7 +194,7 @@ function PricingPage() {
               </div>
             </div>
           </motion.div>
-        </motion.div>
+        </motion.div> */}
 
         {/* CTA Section */}
         <motion.div 
