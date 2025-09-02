@@ -307,6 +307,7 @@ function EmployeeDashboard() {
     { id: 'codes', name: 'Verification Codes', icon: '🔐' },
     { id: 'history', name: 'Access History', icon: '📋' },
     { id: 'employment', name: 'Employment', icon: '💼' },
+    { id: 'reputation', name: 'Reputation', icon: '⭐' },
     // { id: 'privacy', name: 'Privacy Settings', icon: '🔒' },
     // { id: 'settings', name: 'Account Settings', icon: '⚙️' }
   ]
@@ -866,6 +867,235 @@ function EmployeeDashboard() {
                         </div>
                       </motion.div>
                     ))}
+                  </div>
+                </Card>
+              </motion.div>
+            </motion.div>
+          )}
+
+          {activeTab === 'reputation' && (
+            <motion.div
+              key="reputation"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="space-y-6"
+            >
+              {/* Trust Score Overview */}
+              <motion.div variants={itemVariants}>
+                <Card className="p-6 bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-900 mb-2">Community Trust Score</h2>
+                      <p className="text-gray-600">Dynamic indicator based on peer endorsements and verified achievements</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-purple-600 mb-1">78</div>
+                      <div className="text-sm text-gray-600">Good</div>
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4 mb-4">
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-200">
+                      <span className="text-sm font-medium text-gray-700">Peer Endorsements</span>
+                      <span className="text-lg font-bold text-blue-600">12</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-purple-200">
+                      <span className="text-sm font-medium text-gray-700">Verified Badges</span>
+                      <span className="text-lg font-bold text-green-600">5</span>
+                    </div>
+                  </div>
+                  <motion.div
+                    className="w-full"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <a 
+                      href="/trust-score" 
+                      className="block w-full text-center py-3 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-colors"
+                    >
+                      View Detailed Trust Score
+                    </a>
+                  </motion.div>
+                </Card>
+              </motion.div>
+
+              {/* Reputation Features Grid */}
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Peer Endorsements */}
+                <motion.div variants={itemVariants}>
+                  <Card className="p-6 h-full">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white">
+                        👥
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Peer Endorsements</h3>
+                        <p className="text-sm text-gray-600">Values-driven endorsements from colleagues</p>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Received: 12</span>
+                        <span>Approved: 10</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Reliability</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Teamwork</span>
+                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">+3 more</span>
+                      </div>
+                    </div>
+                    <motion.div whileHover={{ scale: 1.02 }}>
+                      <a 
+                        href="/endorsements" 
+                        className="block w-full text-center py-2 px-4 border border-blue-300 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                      >
+                        Manage Endorsements
+                      </a>
+                    </motion.div>
+                  </Card>
+                </motion.div>
+
+                {/* Ethics Badges */}
+                <motion.div variants={itemVariants}>
+                  <Card className="p-6 h-full">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white">
+                        🏆
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Achievement Badges</h3>
+                        <p className="text-sm text-gray-600">Professional ethics and responsibility badges</p>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Total: 5</span>
+                        <span>Verified: 3</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Code of Conduct</span>
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Zero Complaints</span>
+                      </div>
+                    </div>
+                    <motion.div whileHover={{ scale: 1.02 }}>
+                      <a 
+                        href="/badges" 
+                        className="block w-full text-center py-2 px-4 border border-green-300 text-green-600 rounded-lg hover:bg-green-50 transition-colors"
+                      >
+                        View All Badges
+                      </a>
+                    </motion.div>
+                  </Card>
+                </motion.div>
+
+                {/* Behavioral Reliability */}
+                <motion.div variants={itemVariants}>
+                  <Card className="p-6 h-full">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white">
+                        📊
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Behavioral Reliability</h3>
+                        <p className="text-sm text-gray-600">Performance metrics from work platforms</p>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Overall Score: 94%</span>
+                        <span>Projects: 47</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">96% Completion</span>
+                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">4.8★ Rating</span>
+                      </div>
+                    </div>
+                    <motion.div whileHover={{ scale: 1.02 }}>
+                      <a 
+                        href="/reliability" 
+                        className="block w-full text-center py-2 px-4 border border-orange-300 text-orange-600 rounded-lg hover:bg-orange-50 transition-colors"
+                      >
+                        View Reliability Data
+                      </a>
+                    </motion.div>
+                  </Card>
+                </motion.div>
+
+                {/* Reputation Ledger */}
+                <motion.div variants={itemVariants}>
+                  <Card className="p-6 h-full">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center text-white">
+                        📋
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Reputation Ledger</h3>
+                        <p className="text-sm text-gray-600">Time-limited feedback and reviews</p>
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <div className="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Active: 18</span>
+                        <span>Expiring: 3</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">4.6★ Avg Rating</span>
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">3 Expiring Soon</span>
+                      </div>
+                    </div>
+                    <motion.div whileHover={{ scale: 1.02 }}>
+                      <a 
+                        href="/reputation" 
+                        className="block w-full text-center py-2 px-4 border border-purple-300 text-purple-600 rounded-lg hover:bg-purple-50 transition-colors"
+                      >
+                        Manage Reputation
+                      </a>
+                    </motion.div>
+                  </Card>
+                </motion.div>
+              </div>
+
+              {/* Quick Actions */}
+              <motion.div variants={itemVariants}>
+                <Card className="p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <motion.div whileHover={{ scale: 1.02 }}>
+                      <a 
+                        href="/endorsements" 
+                        className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                      >
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">📧</div>
+                          <div className="font-medium text-gray-900">Request Endorsement</div>
+                          <div className="text-sm text-gray-600">Ask colleagues for values-based endorsements</div>
+                        </div>
+                      </a>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.02 }}>
+                      <a 
+                        href="/badges" 
+                        className="block p-4 border border-gray-200 rounded-lg hover:border-green-300 hover:bg-green-50 transition-colors"
+                      >
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">🏅</div>
+                          <div className="font-medium text-gray-900">Add Achievement Badge</div>
+                          <div className="text-sm text-gray-600">Showcase professional achievements</div>
+                        </div>
+                      </a>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.02 }}>
+                      <a 
+                        href="/reliability" 
+                        className="block p-4 border border-gray-200 rounded-lg hover:border-orange-300 hover:bg-orange-50 transition-colors"
+                      >
+                        <div className="text-center">
+                          <div className="text-2xl mb-2">🔗</div>
+                          <div className="font-medium text-gray-900">Connect Platforms</div>
+                          <div className="text-sm text-gray-600">Link freelance accounts for reliability data</div>
+                        </div>
+                      </a>
+                    </motion.div>
                   </div>
                 </Card>
               </motion.div>
