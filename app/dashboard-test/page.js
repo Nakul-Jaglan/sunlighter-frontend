@@ -87,21 +87,21 @@ function DashboardTest() {
         </motion.div>
 
         {/* Navigation Tabs */}
-        <motion.div className="mb-8 flex overflow-x-auto justify-center">
-          <div className="border-b border-gray-200">
-            <nav className="-mb-px flex">
+        <motion.div className="mb-8">
+          <div className="border-b border-gray-200 overflow-x-auto">
+            <nav className="-mb-px flex min-w-full">
               {tabs.map((tab) => (
                 <motion.button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-32 flex-shrink-0 cursor-pointer py-4 px-1 border-b-2 font-medium text-sm flex items-center justify-center transition-colors duration-200
+                  className={`flex-shrink-0 cursor-pointer py-4 px-3 md:px-6 border-b-2 font-medium text-xs md:text-sm flex items-center justify-center transition-colors duration-200 whitespace-nowrap min-w-0
                     ${
                       activeTab === tab.id
                         ? 'border-blue-500 text-blue-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                 >
-                  <span>{tab.name}</span>
+                  <span className="truncate">{tab.name}</span>
                 </motion.button>
               ))}
             </nav>
@@ -202,51 +202,58 @@ function DashboardTest() {
               <motion.div>
                 <Card className="p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Active Verification Codes</h2>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {verificationCodes.map((code) => (
-                          <tr key={code.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <code className="text-sm font-mono bg-gray-200 text-gray-700 px-2 py-1 rounded">{code.code}</code>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{code.purpose}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(code.created_at).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {new Date(code.expires_at).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                code.status === 'active' ? 'bg-green-100 text-green-800' :
-                                code.status === 'used' ? 'bg-blue-100 text-blue-800' :
-                                'bg-gray-100 text-gray-800'
-                              }`}>
-                                {code.status.charAt(0).toUpperCase() + code.status.slice(1)}
-                              </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {code.status === 'active' && (
-                                <button className="text-red-600 hover:text-red-800">
-                                  Revoke
-                                </button>
-                              )}
-                            </td>
+                  <div className="overflow-x-auto -mx-4 sm:mx-0">
+                    <div className="inline-block min-w-full align-middle">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Code</th>
+                            <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purpose</th>
+                            <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Created</th>
+                            <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Expires</th>
+                            <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-3 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {verificationCodes.map((code) => (
+                            <tr key={code.id}>
+                              <td className="px-3 md:px-6 py-4 whitespace-nowrap">
+                                <code className="text-xs md:text-sm font-mono bg-gray-200 text-gray-700 px-1 md:px-2 py-1 rounded">{code.code}</code>
+                              </td>
+                              <td className="px-3 md:px-6 py-4 text-xs md:text-sm text-gray-900">
+                                <div className="max-w-xs truncate">{code.purpose}</div>
+                                <div className="sm:hidden text-xs text-gray-500 mt-1">
+                                  {new Date(code.created_at).toLocaleDateString()} • {new Date(code.expires_at).toLocaleDateString()}
+                                </div>
+                              </td>
+                              <td className="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-gray-500 hidden sm:table-cell">
+                                {new Date(code.created_at).toLocaleDateString()}
+                              </td>
+                              <td className="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-gray-500 hidden sm:table-cell">
+                                {new Date(code.expires_at).toLocaleDateString()}
+                              </td>
+                              <td className="px-3 md:px-6 py-4 whitespace-nowrap">
+                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                  code.status === 'active' ? 'bg-green-100 text-green-800' :
+                                  code.status === 'used' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {code.status.charAt(0).toUpperCase() + code.status.slice(1)}
+                                </span>
+                              </td>
+                              <td className="px-3 md:px-6 py-4 whitespace-nowrap text-xs md:text-sm text-gray-500">
+                                {code.status === 'active' && (
+                                  <button className="text-red-600 hover:text-red-800">
+                                    Revoke
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </Card>
               </motion.div>
@@ -257,9 +264,9 @@ function DashboardTest() {
             <motion.div key="employment" className="space-y-6">
               <motion.div>
                 <Card className="p-6">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
                     <h2 className="text-xl font-semibold text-gray-900">Employment History</h2>
-                    <Button className="py-2">
+                    <Button className="py-2 w-full sm:w-auto">
                       Add New Employment
                     </Button>
                   </div>
@@ -272,34 +279,40 @@ function DashboardTest() {
                           employment.isCurrent ? 'border-green-200 bg-green-50' : 'border-gray-200'
                         }`}
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <h3 className="text-lg font-semibold text-gray-900">{employment.role}</h3>
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 mb-2">
+                              <h3 className="text-lg font-semibold text-gray-900 truncate">{employment.role}</h3>
                               {employment.isCurrent && (
-                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 w-fit mt-1 sm:mt-0">
                                   Current
                                 </span>
                               )}
                             </div>
-                            <p className="text-blue-600 font-medium mb-2">{employment.company}</p>
-                            <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-600">
-                              <div>
-                                <span className="font-medium">Duration:</span> {new Date(employment.joiningDate).toLocaleDateString()} - {employment.endDate ? new Date(employment.endDate).toLocaleDateString() : 'Present'}
+                            <p className="text-blue-600 font-medium mb-2 truncate">{employment.company}</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm text-gray-600">
+                              <div className="min-w-0">
+                                <span className="font-medium">Duration:</span> 
+                                <span className="block sm:inline sm:ml-1 truncate">
+                                  {new Date(employment.joiningDate).toLocaleDateString()} - {employment.endDate ? new Date(employment.endDate).toLocaleDateString() : 'Present'}
+                                </span>
                               </div>
-                              <div>
-                                <span className="font-medium">Company Handle:</span> @{employment.companyHandle}
+                              <div className="min-w-0">
+                                <span className="font-medium">Company Handle:</span> 
+                                <span className="block sm:inline sm:ml-1 truncate">@{employment.companyHandle}</span>
                               </div>
-                              <div>
-                                <span className="font-medium">Type:</span> {employment.employmentType}
+                              <div className="min-w-0">
+                                <span className="font-medium">Type:</span> 
+                                <span className="block sm:inline sm:ml-1">{employment.employmentType}</span>
                               </div>
-                              <div>
-                                <span className="font-medium">Department:</span> {employment.department}
+                              <div className="min-w-0">
+                                <span className="font-medium">Department:</span> 
+                                <span className="block sm:inline sm:ml-1 truncate">{employment.department}</span>
                               </div>
                             </div>
                           </div>
                           
-                          <div className="flex flex-col space-y-2">
+                          <div className="flex flex-row sm:flex-col gap-2 sm:space-y-2 sm:space-x-0 flex-shrink-0">
                             {!employment.isCurrent && (
                               <button className="text-sm text-blue-600 hover:text-blue-800">
                                 Mark as Current
