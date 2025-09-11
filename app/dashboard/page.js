@@ -22,7 +22,6 @@ function EmployeeDashboard() {
   const [employments, setEmployments] = useState([])
   const [verificationCodes, setVerificationCodes] = useState([])
   const [accessHistory, setAccessHistory] = useState([])
-  
   // Computed values
   const currentEmployment = employments.find(emp => emp.isCurrent) || null
   const employmentStatus = !!currentEmployment
@@ -749,18 +748,19 @@ function EmployeeDashboard() {
                             <div className="flex items-center space-x-2">
                               <h3 className="font-semibold text-gray-900">{access.employer}</h3>
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                access.authorized ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                !access.requires_approval ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                               }`}>
-                                {access.authorized ? 'Authorized' : 'Unauthorized'}
+                                {!access.requires_approval ? 'Authorized' : 'Unauthorized'}
                               </span>
                             </div>
                             <div className="text-sm text-gray-500 mt-1">
-                              <span>Code: {access.codeUsed}</span> • 
-                              <span> {access.timestamp}</span> • 
+                              <span>Code: {access.verification_code}</span> • 
+                              <span> {new Date(access.accessed_at).toLocaleString()}</span> • 
+                              <span> {access.ip_address}</span> • 
                               <span> {access.location}</span>
                             </div>
                           </div>
-                          {!access.authorized && (
+                          {access.requires_approval && (
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}

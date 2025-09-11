@@ -29,7 +29,7 @@ export default function EmployerVerificationPage() {
     )
   }
 
-  if (!user || localStorage.getItem('userType') !== 'employers') {
+  if (!user || userType !== 'employers') {
     return null
   }
 
