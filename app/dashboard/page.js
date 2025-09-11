@@ -395,8 +395,8 @@ function EmployeeDashboard() {
         </motion.div>
 
         {/* Navigation Tabs */}
-        <motion.div className="mb-8 flex overflow-x-auto justify-center" variants={itemVariants}>
-          <div className="border-b border-gray-200">
+        <motion.div className="mb-8 flex overflow-x-auto justify-start" variants={itemVariants}>
+          <div className="border-b border-gray-200 min-w-full">
             <nav className="-mb-px flex">
               {tabs.map((tab) => (
                 <motion.button
